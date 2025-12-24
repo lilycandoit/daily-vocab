@@ -385,34 +385,21 @@ class DailyVocabContent {
     });
   }
 
-  playAudio(audioUrl) {
-    if (!audioUrl) {
-      console.log('No audio available for this word');
-      return;
-    }
-
-    if (!this.audioElement) {
-      console.error('Audio element not initialized');
-      return;
-    }
+  async playAudio(audioUrl) {
+    if (!audioUrl) return;
 
     try {
-      // Format audio URL
-      const formattedUrl = WordAPI.getAudioUrl(audioUrl);
-
-      if (!formattedUrl) {
-        console.log('No valid audio URL');
-        return;
-      }
-
-      this.audioElement.src = formattedUrl;
-      this.audioElement.play().catch(error => {
-        console.error('Error playing audio:', error);
-        // Don't show alert for audio errors - just log it
-        // Some words don't have audio available
+      const response = await chrome.runtime.sendMessage({
+        action: 'getAudioData',
+        audioUrl: audioUrl
       });
+
+      if (response && response.success && response.audioData) {
+        const audio = new Audio(response.audioData);
+        await audio.play();
+      }
     } catch (error) {
-      console.error('Error setting up audio:', error);
+      console.error('Error playing audio:', error);
     }
   }
 

@@ -1,211 +1,236 @@
 // Background service worker for Daily Vocab extension
+// Handles word processing, storage, alarms, and notifications
 
 // Import utilities
 importScripts('utils/storage.js');
 importScripts('utils/api.js');
 
-// Initialize extension on installation
-chrome.runtime.onInstalled.addListener(async (details) => {
-  if (details.reason === 'install') {
-    // Initialize default settings
-    await initializeDefaultSettings();
-
-    // Set up daily alarm for 9 PM
-    await setupDailyAlarm();
-
-    // Mark as first-time user to show welcome guide
-    await chrome.storage.sync.set({ firstTimeUser: true });
-
-    console.log('Daily Vocab extension installed successfully');
-  }
-});
-
-// Initialize default settings
-async function initializeDefaultSettings() {
-  const defaultSettings = {
-    userLanguage: 'vi', // Default Vietnamese
-    maxPhraseLength: 50,
-    maxWords: 200,
-    reminderTime: '21:00', // 9 PM
-    reminderEnabled: true,
-    includeWeekends: true,
-    viewMode: 'cards',
-    groupBy: 'date',
-    audioBehavior: 'click',
-    selectionMethod: 'double-click',
-    autoDismiss: 3000,
-    tooltipPosition: 'auto'
-  };
-
-  // Check if settings already exist
-  const existingSettings = await chrome.storage.sync.get('settings');
-  if (!existingSettings.settings) {
-    await chrome.storage.sync.set({ settings: defaultSettings });
-  }
-
-  // Initialize words array if empty
-  const existingWords = await chrome.storage.sync.get('words');
-  if (!existingWords.words) {
-    await chrome.storage.sync.set({ words: [] });
-  }
-
-  // Initialize statistics
-  const existingStats = await chrome.storage.sync.get('statistics');
-  if (!existingStats.statistics) {
-    const defaultStats = {
-      totalWords: 0,
-      wordsThisWeek: 0,
-      currentStreak: 0,
-      lastReviewDate: null,
-      dailyQuotes: {
-        lastQuote: null,
-        quoteDate: null
-      }
-    };
-    await chrome.storage.sync.set({ statistics: defaultStats });
-  }
-}
-
-// Setup daily alarm for 9 PM
-async function setupDailyAlarm() {
-  const settings = await chrome.storage.sync.get('settings');
-  const reminderTime = settings.settings?.reminderTime || '21:00';
-
-  // Calculate next 9 PM
-  const now = new Date();
-  const [hours, minutes] = reminderTime.split(':').map(Number);
-
-  const nextAlarm = new Date();
-  nextAlarm.setHours(hours, minutes, 0, 0);
-
-  // If time has passed today, set for tomorrow
-  if (nextAlarm <= now) {
-    nextAlarm.setDate(nextAlarm.getDate() + 1);
-  }
-
-  // Create alarm
-  await chrome.alarms.create('daily-review', {
-    when: nextAlarm.getTime(),
-    periodInMinutes: 1440 // Repeat every 24 hours
-  });
-
-  console.log('Daily review alarm set for:', nextAlarm);
-}
-
-// Handle alarm events
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === 'daily-review') {
-    await showDailyReminder();
-  }
-});
-
-// Show daily reminder notification
-async function showDailyReminder() {
+// handle migration of data from sync to local as sync is too small (8KB limit)
+async function migrateStorage() {
   try {
-    const settings = await chrome.storage.sync.get('settings');
-    const words = await chrome.storage.sync.get('words');
+    const syncData = await chrome.storage.sync.get(['words', 'statistics']);
+    const localData = await chrome.storage.local.get(['words', 'statistics']);
 
-    if (!settings.settings?.reminderEnabled) {
-      return;
+    // Migrate words if they exist in sync but not local
+    if (syncData.words && syncData.words.length > 0 && (!localData.words || localData.words.length === 0)) {
+      console.log('Migrating words to local storage');
+      await chrome.storage.local.set({ words: syncData.words });
     }
 
-    const wordCount = words.words?.length || 0;
-
-    if (wordCount === 0) {
-      return; // Don't show notification if no words to review
+    // Migrate statistics
+    if (syncData.statistics && !localData.statistics) {
+      console.log('Migrating statistics to local storage');
+      await chrome.storage.local.set({ statistics: syncData.statistics });
     }
+  } catch (error) {
+    console.error('Migration error:', error);
+  }
+}
 
-    // Get random quote
-    const quote = await getRandomQuote();
+// Helper: Get next reminder time for an alarm
+function getNextReminderTime(timeStr) {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const now = new Date();
+  const next = new Date();
+  next.setHours(hours, minutes, 0, 0);
 
-    // Create notification
-    await chrome.notifications.create('daily-review', {
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'Daily Vocabulary Review',
-      message: `${wordCount} words to review tonight! 🌙\n"${quote.text}" - ${quote.author}`,
-      requireInteraction: true,
-      buttons: [
-        { title: 'Review Now' },
-        { title: 'Mark Complete' }
-      ]
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+
+  return next.getTime();
+}
+
+// Handle initialization
+chrome.runtime.onInstalled.addListener(async (details) => {
+  await migrateStorage();
+
+  if (details.reason === 'install') {
+    // Set default settings in sync storage (safe as it is small)
+    await chrome.storage.sync.set({
+      settings: {
+        userLanguage: 'vi',
+        selectionMethod: 'double-click',
+        autoDismiss: 3000,
+        reminderEnabled: true,
+        reminderTime: '21:00',
+        maxWords: 200
+      },
+      firstTimeUser: true
     });
 
-    console.log('Daily reminder notification sent');
-  } catch (error) {
-    console.error('Error showing daily reminder:', error);
+    // Initialize words and statistics in local storage (much larger limit)
+    await chrome.storage.local.set({
+      words: [],
+      statistics: {
+        totalSaved: 0,
+        totalReviewed: 0,
+        currentStreak: 0,
+        lastReviewDate: null,
+        dailyQuotes: { lastQuote: null, quoteDate: null }
+      }
+    });
+
+    // Create daily alarm
+    chrome.alarms.create('daily-review', {
+      when: getNextReminderTime('21:00'),
+      periodInMinutes: 1440
+    });
+
+    console.log('Daily Vocab extension installed and initialized');
   }
+});
+
+// Storage Helpers
+async function getWords() {
+  const data = await chrome.storage.local.get('words');
+  return data.words || [];
 }
 
-// Get random quote from free API
-async function getRandomQuote() {
-  try {
-    const response = await fetch('https://type.fit/api/quotes');
-    const quotes = await response.json();
-    return quotes[Math.floor(Math.random() * quotes.length)];
-  } catch (error) {
-    console.error('Error fetching quote:', error);
-    // Fallback quote
-    return {
-      text: "The journey of a thousand miles begins with one step.",
-      author: "Lao Tzu"
-    };
-  }
+async function saveWords(words) {
+  await chrome.storage.local.set({ words });
 }
 
-// Handle notification button clicks
-chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIndex) => {
-  if (notificationId === 'daily-review') {
-    if (buttonIndex === 0) {
-      // "Review Now" - Open popup
-      chrome.action.openPopup();
-    } else if (buttonIndex === 1) {
-      // "Mark Complete" - Update statistics
-      await markReviewComplete();
+async function getStatistics() {
+  const data = await chrome.storage.local.get('statistics');
+  return data.statistics || {
+    totalSaved: 0,
+    totalReviewed: 0,
+    currentStreak: 0,
+    lastReviewDate: null
+  };
+}
+
+async function saveStatistics(statistics) {
+  await chrome.storage.local.set({ statistics });
+}
+
+// Alarms & Notifications
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === 'daily-review') {
+    const settingsResult = await chrome.storage.sync.get('settings');
+    const settings = settingsResult.settings || {};
+
+    if (settings.reminderEnabled !== false) {
+      const words = await getWords();
+      if (words.length > 0) {
+        chrome.notifications.create('review-reminder', {
+          type: 'basic',
+          iconUrl: 'icons/icon128.png',
+          title: 'Daily Vocab Review',
+          message: `You have ${words.length} words to review today! 📚`,
+          buttons: [{ title: 'Start Review' }]
+        });
+      }
     }
-
-    // Clear notification
-    await chrome.notifications.clear(notificationId);
   }
 });
 
-// Handle notification clicks
-chrome.notifications.onClicked.addListener(async (notificationId) => {
-  if (notificationId === 'daily-review') {
-    // Open popup for review
+chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
+  if (notifId === 'review-reminder' && btnIdx === 0) {
     chrome.action.openPopup();
-    await chrome.notifications.clear(notificationId);
   }
 });
 
-// Mark review session as complete
+// Message Handler Actions
+async function saveWord(wordData) {
+  const words = await getWords();
+  const existingIndex = words.findIndex(w => w.text.toLowerCase() === wordData.text.toLowerCase());
+
+  if (existingIndex >= 0) {
+    words[existingIndex] = {
+      ...words[existingIndex],
+      ...wordData,
+      metadata: {
+        ...words[existingIndex].metadata,
+        dateSaved: new Date().toISOString()
+      }
+    };
+  } else {
+    words.unshift({
+      id: Date.now().toString(),
+      ...wordData,
+      metadata: {
+        dateSaved: new Date().toISOString(),
+        isReviewed: false,
+        reviewCount: 0
+      }
+    });
+  }
+
+  // Enforce limit
+  const settingsResult = await chrome.storage.sync.get('settings');
+  const maxWords = settingsResult.settings?.maxWords || 200;
+  if (words.length > maxWords) words.length = maxWords;
+
+  await saveWords(words);
+
+  // Update stats
+  const stats = await getStatistics();
+  stats.totalSaved = (stats.totalSaved || 0) + 1;
+  await saveStatistics(stats);
+}
+
+async function updateWord(wordId, updates) {
+  const words = await getWords();
+  const index = words.findIndex(w => w.id === wordId);
+  if (index >= 0) {
+    words[index] = { ...words[index], ...updates };
+    await saveWords(words);
+  }
+}
+
+async function deleteWord(wordId) {
+  const words = await getWords();
+  const filtered = words.filter(w => w.id !== wordId);
+  await saveWords(filtered);
+}
+
 async function markReviewComplete() {
-  const stats = await chrome.storage.sync.get('statistics');
-  const statistics = stats.statistics || {};
-
-  statistics.lastReviewDate = new Date().toISOString();
-
-  // Update streak (simplified - could be more sophisticated)
+  const stats = await getStatistics();
   const today = new Date().toDateString();
-  const lastReview = statistics.lastReviewDate ? new Date(statistics.lastReviewDate).toDateString() : null;
+  const lastReview = stats.lastReviewDate ? new Date(stats.lastReviewDate).toDateString() : null;
 
   if (lastReview !== today) {
-    statistics.currentStreak = (statistics.currentStreak || 0) + 1;
+    stats.currentStreak = (stats.currentStreak || 0) + 1;
+    stats.lastReviewDate = new Date().toISOString();
+    stats.totalReviewed = (stats.totalReviewed || 0) + 1;
+    await saveStatistics(stats);
   }
-
-  await chrome.storage.sync.set({ statistics });
-  console.log('Review session marked as complete');
 }
 
-// Handle messages from content scripts and popup
+async function updateStatistics() {
+  const words = await getWords();
+  const stats = await getStatistics();
+
+  // Update total words
+  stats.totalWords = words.length;
+
+  // Calculate words this week
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  stats.wordsThisWeek = words.filter(w => {
+    const dateSaved = new Date(w.metadata.dateSaved);
+    return dateSaved >= oneWeekAgo;
+  }).length;
+
+  await saveStatistics(stats);
+}
+
+// Main Command Router
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Wrap in async IIFE to properly handle async operations
   (async () => {
     try {
       switch (message.action) {
         case 'getWordData':
-          const wordData = await WordAPI.getWordData(message.text, message.userLanguage);
-          sendResponse({ success: true, data: wordData });
+          const data = await WordAPI.getWordData(message.text, message.userLanguage);
+          sendResponse({ success: true, data });
+          break;
+
+        case 'getAudioData':
+          const audioBase64 = await WordAPI.fetchAudioBase64(message.audioUrl);
+          sendResponse({ success: true, audioData: audioBase64 });
           break;
 
         case 'saveWord':
@@ -214,8 +239,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           break;
 
         case 'getWords':
-          const words = await chrome.storage.sync.get('words');
-          sendResponse({ success: true, words: words.words || [] });
+          const wordsList = await getWords();
+          sendResponse({ success: true, words: wordsList });
           break;
 
         case 'updateWord':
@@ -228,28 +253,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: true });
           break;
 
+        case 'markReviewComplete':
+          await markReviewComplete();
+          sendResponse({ success: true });
+          break;
+
         case 'getSettings':
-          const settings = await chrome.storage.sync.get('settings');
-          sendResponse({ success: true, settings: settings.settings || {} });
+          const setRes = await chrome.storage.sync.get('settings');
+          sendResponse({ success: true, settings: setRes.settings || {} });
           break;
 
         case 'updateSettings':
-          await updateSettings(message.settings);
+          await chrome.storage.sync.set({ settings: message.settings });
           sendResponse({ success: true });
           break;
 
         case 'getStatistics':
-          const statistics = await chrome.storage.sync.get('statistics');
-          sendResponse({ success: true, statistics: statistics.statistics || {} });
+          const statRes = await getStatistics();
+          sendResponse({ success: true, statistics: statRes });
           break;
 
         case 'clearAllWords':
-          await chrome.storage.sync.set({ words: [] });
-          sendResponse({ success: true });
-          break;
-
-        case 'resetSettings':
-          await StorageManager.resetSettings();
+          await saveWords([]);
           sendResponse({ success: true });
           break;
 
@@ -257,181 +282,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: false, error: 'Unknown action' });
       }
     } catch (error) {
-      console.error('Error handling message:', error);
+      console.error('Background message error:', error);
       sendResponse({ success: false, error: error.message });
     }
   })();
-
-  return true; // Keep message channel open for async response
+  return true; // Keep channel open for async response
 });
-
-// Save word to storage
-async function saveWord(wordData) {
-  const result = await chrome.storage.sync.get('words');
-  const words = result.words || [];
-
-  // Check if word already exists
-  const existingIndex = words.findIndex(w => w.text.toLowerCase() === wordData.text.toLowerCase());
-
-  if (existingIndex >= 0) {
-    // Update existing word
-    words[existingIndex] = {
-      ...words[existingIndex],
-      ...wordData,
-      metadata: {
-        ...words[existingIndex].metadata,
-        dateSaved: new Date().toISOString(),
-        reviewCount: (words[existingIndex].metadata?.reviewCount || 0) + 1
-      }
-    };
-  } else {
-    // Add new word
-    const newWord = {
-      id: generateId(),
-      ...wordData,
-      metadata: {
-        dateSaved: new Date().toISOString(),
-        selectionMethod: 'double-click',
-        reviewCount: 0,
-        lastReviewed: null,
-        isReviewed: false
-      }
-    };
-
-    words.push(newWord);
-  }
-
-  // Sort by date (newest first)
-  words.sort((a, b) => new Date(b.metadata.dateSaved) - new Date(a.metadata.dateSaved));
-
-  // Enforce word limit
-  const settings = await chrome.storage.sync.get('settings');
-  const maxWords = settings.settings?.maxWords || 200;
-
-  if (words.length > maxWords) {
-    // Remove oldest words beyond limit
-    words.splice(maxWords);
-  }
-
-  await chrome.storage.sync.set({ words });
-
-  // Update statistics
-  await updateStatistics();
-}
-
-// Update word
-async function updateWord(wordId, updates) {
-  const result = await chrome.storage.sync.get('words');
-  const words = result.words || [];
-
-  const index = words.findIndex(w => w.id === wordId);
-  if (index >= 0) {
-    words[index] = {
-      ...words[index],
-      ...updates,
-      metadata: {
-        ...words[index].metadata,
-        ...updates.metadata
-      }
-    };
-
-    await chrome.storage.sync.set({ words });
-  }
-}
-
-// Delete word
-async function deleteWord(wordId) {
-  const result = await chrome.storage.sync.get('words');
-  const words = result.words || [];
-
-  const filteredWords = words.filter(w => w.id !== wordId);
-  await chrome.storage.sync.set({ words: filteredWords });
-
-  await updateStatistics();
-}
-
-// Update settings
-async function updateSettings(newSettings) {
-  const result = await chrome.storage.sync.get('settings');
-  const settings = { ...result.settings, ...newSettings };
-
-  await chrome.storage.sync.set({ settings });
-
-  // If reminder settings changed, update alarm
-  if (newSettings.reminderTime !== undefined || newSettings.reminderEnabled !== undefined) {
-    await chrome.alarms.clear('daily-review');
-    if (settings.reminderEnabled) {
-      await setupDailyAlarm();
-    }
-  }
-}
-
-// Update statistics
-async function updateStatistics() {
-  const result = await chrome.storage.sync.get('words');
-  const words = result.words || [];
-
-  const statistics = {
-    totalWords: words.length,
-    wordsThisWeek: countWordsThisWeek(words),
-    currentStreak: await calculateStreak(),
-    lastReviewDate: new Date().toISOString()
-  };
-
-  await chrome.storage.sync.set({ statistics });
-}
-
-// Count words added this week
-function countWordsThisWeek(words) {
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-  return words.filter(word =>
-    new Date(word.metadata.dateSaved) > oneWeekAgo
-  ).length;
-}
-
-// Calculate current streak
-async function calculateStreak() {
-  // Simplified streak calculation
-  const stats = await chrome.storage.sync.get('statistics');
-  const lastReview = stats.statistics?.lastReviewDate;
-
-  if (!lastReview) return 0;
-
-  const daysSinceReview = Math.floor(
-    (Date.now() - new Date(lastReview)) / (1000 * 60 * 60 * 24)
-  );
-
-  return daysSinceReview <= 1 ? (stats.statistics.currentStreak || 0) : 0;
-}
-
-// Generate unique ID
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-// Cleanup old cache entries periodically
-chrome.alarms.create('cache-cleanup', {
-  periodInMinutes: 1440 // Once daily
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === 'cache-cleanup') {
-    await cleanupCache();
-  }
-});
-
-// Cleanup cache
-async function cleanupCache() {
-  const allData = await chrome.storage.local.get();
-  const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days ago
-
-  for (const key in allData) {
-    if (key.startsWith('cache_') && allData[key].cachedAt < cutoff) {
-      await chrome.storage.local.remove(key);
-    }
-  }
-
-  console.log('Cache cleanup completed');
-}

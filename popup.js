@@ -541,14 +541,10 @@ class DailyVocabPopup {
   async completeReviewSession() {
     try {
       const response = await chrome.runtime.sendMessage({
-        action: 'updateStatistics',
-        newStats: {
-          lastReviewDate: new Date().toISOString()
-        }
+        action: 'markReviewComplete'
       });
 
       if (response && response.success) {
-        this.statistics.lastReviewDate = new Date().toISOString();
         this.showMessage('Review session completed! Great job! 🎉');
 
         // Update streak

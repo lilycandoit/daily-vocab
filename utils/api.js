@@ -38,45 +38,75 @@ class WordAPI {
         throw new Error('Word not found in dictionary');
       }
 
-      const wordData = data[0];
-
-      // Extract IPA phonetics
-      let ipa = wordData.phonetic || '';
+      // Aggregate data from all matching entries
+      let ipa = '';
       let audio = '';
+      const meaningsArr = [];
+      let origin = '';
 
-      // Find best phonetic entry with audio
-      if (wordData.phonetics && wordData.phonetics.length > 0) {
-        const phoneticWithAudio = wordData.phonetics.find(p => p.audio);
-        if (phoneticWithAudio) {
-          ipa = phoneticWithAudio.text || ipa;
-          audio = phoneticWithAudio.audio;
-        } else if (wordData.phonetics[0]) {
-          ipa = wordData.phonetics[0].text || ipa;
+      for (const entry of data) {
+        // Collect IPA
+        if (!ipa && entry.phonetic) ipa = entry.phonetic;
+
+        // Search through phonetics for audio and text
+        if (entry.phonetics && entry.phonetics.length > 0) {
+          for (const p of entry.phonetics) {
+            if (!ipa && p.text) ipa = p.text;
+            if (!audio && p.audio) audio = p.audio;
+          }
         }
+
+        // Collect meanings
+        if (entry.meanings) {
+          meaningsArr.push(...entry.meanings);
+        }
+
+        // Collect origin
+        if (!origin && entry.origin) origin = entry.origin;
       }
 
-      // Extract first meaning for context
+      // Extract first meaning for quick display
       let firstMeaning = '';
-      if (wordData.meanings && wordData.meanings.length > 0) {
-        const meaning = wordData.meanings[0];
-        if (meaning.definitions && meaning.definitions.length > 0) {
-          firstMeaning = meaning.definitions[0].definition || '';
-        }
+      if (meaningsArr.length > 0) {
+        const firstDef = meaningsArr[0].definitions[0];
+        firstMeaning = firstDef ? firstDef.definition : '';
       }
 
       return {
-        text: wordData.word,
-        type: 'single-word',
+        text: word,
+        type: meaningsArr[0]?.partOfSpeech || 'word',
         ipa: ipa,
         audio: audio,
         meaning: firstMeaning,
-        meanings: wordData.meanings || [],
-        origin: wordData.origin || ''
+        meanings: meaningsArr,
+        origin: origin
       };
 
     } catch (error) {
       console.error('Error fetching single word data:', error);
       throw new Error(`Failed to get word data: ${error.message}`);
+    }
+  }
+
+  // Fetch audio file and convert to base64 to bypass CSP
+  static async fetchAudioBase64(audioUrl) {
+    try {
+      const url = this.getAudioUrl(audioUrl);
+      if (!url) return null;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch audio file');
+
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error fetching audio base64:', error);
+      return null;
     }
   }
 
@@ -279,8 +309,15 @@ class WordAPI {
       return audioPath;
     } else if (audioPath.startsWith('//')) {
       return 'https:' + audioPath;
+    } else if (audioPath.startsWith('/')) {
+      return 'https://api.dictionaryapi.dev' + audioPath;
     } else {
-      return 'https://' + audioPath;
+      // Check if it's already a full domain without protocol
+      if (audioPath.includes('.') && !audioPath.includes('/')) {
+        return 'https://' + audioPath;
+      }
+      // Otherwise assume it's a relative path to the dictionary API
+      return 'https://api.dictionaryapi.dev/' + audioPath;
     }
   }
 
