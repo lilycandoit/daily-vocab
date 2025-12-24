@@ -389,17 +389,19 @@ class DailyVocabContent {
     if (!audioUrl) return;
 
     try {
-      const response = await chrome.runtime.sendMessage({
-        action: 'getAudioData',
-        audioUrl: audioUrl
+      // Format URL if it's relative
+      const formattedUrl = WordAPI.getAudioUrl(audioUrl);
+
+      // Send message to background to play audio in offscreen document
+      // This bypasses the website's Content Security Policy (CSP)
+      await chrome.runtime.sendMessage({
+        action: 'playAudio',
+        audioUrl: formattedUrl
       });
 
-      if (response && response.success && response.audioData) {
-        const audio = new Audio(response.audioData);
-        await audio.play();
-      }
+      console.log('Audio playback requested via background');
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('Error requesting audio playback:', error);
     }
   }
 

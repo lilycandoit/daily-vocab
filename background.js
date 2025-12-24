@@ -218,11 +218,40 @@ async function updateStatistics() {
   await saveStatistics(stats);
 }
 
+// Helper to manage offscreen document for audio
+async function playAudioBackground(audioUrl) {
+  // Check if offscreen document exists
+  const contexts = await chrome.runtime.getContexts({
+    contextTypes: ['OFFSCREEN_DOCUMENT']
+  });
+
+  if (contexts.length === 0) {
+    // Create offscreen document
+    await chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: ['AUDIO_PLAYBACK'],
+      justification: 'Play word pronunciation'
+    });
+  }
+
+  // Send message to offscreen document
+  chrome.runtime.sendMessage({
+    target: 'offscreen',
+    action: 'play-audio',
+    audioUrl: audioUrl
+  });
+}
+
 // Main Command Router
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     try {
       switch (message.action) {
+        case 'playAudio':
+          await playAudioBackground(message.audioUrl);
+          sendResponse({ success: true });
+          break;
+
         case 'getWordData':
           const data = await WordAPI.getWordData(message.text, message.userLanguage);
           sendResponse({ success: true, data });

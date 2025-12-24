@@ -426,9 +426,11 @@ class DailyVocabPopup {
       const word = this.words.find(w => w.id === wordId);
       if (!word || !word.audio) return;
 
-      const audio = new Audio();
-      audio.src = WordAPI.getAudioUrl(word.audio);
-      await audio.play();
+      // Use the background's offscreen logic for consistency and robustness
+      await chrome.runtime.sendMessage({
+        action: 'playAudio',
+        audioUrl: WordAPI.getAudioUrl(word.audio)
+      });
     } catch (error) {
       console.error('Error playing audio:', error);
     }
