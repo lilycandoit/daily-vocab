@@ -1,0 +1,41 @@
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if you add build tools later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# Temporary files
+*.tmp
+*.log
+.cache/
+
+# Personal/sensitive files
+.env
+.env.local
+secrets.json
+
+# Development documentation (optional)
+FIX_SUMMARY.md
+POPUP_FIX.md
+ICON-FIX.md
+PUBLISHING.md
+
+# Chrome extension package (generated when you pack the extension)
+*.crx
+*.pem
+
+# Backup files
+*.bak
+backup/

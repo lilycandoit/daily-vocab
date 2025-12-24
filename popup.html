@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Vocab - Review Words</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-content">
+        <h1 class="app-title">
+          <span class="icon">📚</span>
+          Daily Vocab
+        </h1>
+        <div class="header-stats">
+          <span class="word-count" id="wordCount">0 words</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="popup-main">
+      <!-- Loading State -->
+      <div class="loading-state" id="loadingState">
+        <div class="loading-spinner"></div>
+        <p>Loading your words...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">📝</div>
+        <h2>No words yet</h2>
+        <p>Start by double-clicking words while reading to save them here.</p>
+        <button class="btn btn-primary" id="howToUseBtn">How to Use</button>
+      </div>
+
+      <!-- Word List Container -->
+      <div class="word-list-container" id="wordListContainer" style="display: none;">
+        <!-- Controls Bar -->
+        <div class="controls-bar">
+          <div class="view-controls">
+            <button class="btn btn-secondary view-btn active" id="cardViewBtn" title="Card View">
+              <span class="icon">🃏</span>
+            </button>
+            <button class="btn btn-secondary view-btn" id="listViewBtn" title="List View">
+              <span class="icon">📋</span>
+            </button>
+          </div>
+          
+          <div class="sort-controls">
+            <label for="sortSelect">Sort:</label>
+            <select class="sort-select" id="sortSelect">
+              <option value="date">Date Added</option>
+              <option value="alphabetical">Alphabetical</option>
+              <option value="type">Word Type</option>
+            </select>
+          </div>
+          
+          <div class="search-controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search words...">
+            <button class="btn btn-secondary search-btn" id="searchBtn" title="Search">
+              <span class="icon">🔍</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Word Cards View -->
+        <div class="word-cards-view" id="wordCardsView">
+          <div class="word-cards" id="wordCards">
+            <!-- Word cards will be dynamically inserted here -->
+          </div>
+        </div>
+
+        <!-- Word List View -->
+        <div class="word-list-view" id="wordListView" style="display: none;">
+          <div class="word-list" id="wordList">
+            <!-- Word list items will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <div class="footer-actions">
+        <button class="btn btn-secondary" id="exportBtn" title="Export for AI Review">
+          <span class="icon">📋</span>
+          Export
+        </button>
+        <button class="btn btn-secondary" id="markAllReviewedBtn" title="Mark All as Reviewed">
+          <span class="icon">✓</span>
+          Mark All Reviewed
+        </button>
+        <button class="btn btn-primary" id="reviewCompleteBtn" title="Complete Review Session">
+          <span class="icon">🎉</span>
+          Complete Review
+        </button>
+      </div>
+      
+      <div class="footer-links">
+        <button class="link-btn" id="settingsBtn">Settings</button>
+        <span class="separator">•</span>
+        <button class="link-btn" id="statsBtn">Statistics</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Export Modal -->
+  <div class="modal" id="exportModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Export Words for AI Review</h3>
+        <button class="modal-close" id="exportModalClose">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="export-options">
+          <label for="promptSelect">Choose Prompt Template:</label>
+          <select class="prompt-select" id="promptSelect">
+            <option value="australian-usage">Australian English Usage</option>
+            <option value="comprehensive">Comprehensive Analysis</option>
+            <option value="pronunciation-focus">Pronunciation Focus</option>
+            <option value="context-examples">Context Examples</option>
+          </select>
+        </div>
+        
+        <div class="export-preview">
+          <label>Preview:</label>
+          <div class="preview-content" id="previewContent">
+            <!-- Preview will be generated here -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="copyExportBtn">Copy to Clipboard</button>
+        <button class="btn btn-primary" id="openChatGBtn">Open ChatGPT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Modal -->
+  <div class="modal" id="statsModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Learning Statistics</h3>
+        <button class="modal-close" id="statsModalClose">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="totalWordsStat">0</div>
+            <div class="stat-label">Total Words</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="wordsThisWeekStat">0</div>
+            <div class="stat-label">Words This Week</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="currentStreakStat">0</div>
+            <div class="stat-label">Current Streak</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="unreviewedStat">0</div>
+            <div class="stat-label">Unreviewed</div>
+          </div>
+        </div>
+        
+        <div class="storage-info">
+          <h4>Storage Usage</h4>
+          <div class="storage-bar">
+            <div class="storage-fill" id="storageFill"></div>
+          </div>
+          <div class="storage-text" id="storageText">Calculating...</div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="clearAllBtn">Clear All Words</button>
+        <button class="btn btn-primary" id="exportDataBtn">Export Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to Use Modal -->
+  <div class="modal" id="howToUseModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>How to Use Daily Vocab</h3>
+        <button class="modal-close" id="howToUseModalClose">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="instructions">
+          <div class="instruction-item">
+            <div class="instruction-number">1</div>
+            <div class="instruction-text">
+              <strong>Double-click</strong> any word while reading to see its pronunciation and translation.
+            </div>
+          </div>
+          
+          <div class="instruction-item">
+            <div class="instruction-number">2</div>
+            <div class="instruction-text">
+              Click the <strong>💾 save button</strong> to add words to your review list.
+            </div>
+          </div>
+          
+          <div class="instruction-item">
+            <div class="instruction-number">3</div>
+            <div class="instruction-text">
+              Open this popup at <strong>9 PM daily</strong> to review your saved words.
+            </div>
+          </div>
+          
+          <div class="instruction-item">
+            <div class="instruction-number">4</div>
+            <div class="instruction-text">
+              <strong>Export</strong> words to ChatGPT or your favorite AI for deep explanations.
+            </div>
+          </div>
+        </div>
+        
+        <div class="tips">
+          <h4>Tips:</h4>
+          <ul>
+            <li>Use Settings to change your native language for translations</li>
+            <li>Set up keyboard shortcuts for faster word selection</li>
+            <li>Enable daily reminders for consistent learning</li>
+            <li>Export words regularly for AI-powered reviews</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="startUsingBtn">Start Using</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="utils/api.js"></script>
+  <script src="utils/storage.js"></script>
+  <script src="utils/cache.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Daily Vocab - Pronunciation & Translation",
+  "version": "1.0.0",
+  "description": "Minimal extension for pronunciation confirmation and intentional vocabulary review with native language translations",
+
+  "permissions": [
+    "storage",
+    "activeTab",
+    "alarms",
+    "notifications"
+  ],
+
+  "host_permissions": [
+    "https://api.dictionaryapi.dev/*",
+    "https://libretranslate.com/*",
+    "https://type.fit/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "utils/storage.js",
+        "utils/api.js",
+        "utils/cache.js",
+        "content.js"
+      ],
+      "css": ["content.css"]
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Daily Vocab - Review Words",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "options_page": "options.html",
+
+  "web_accessible_resources": [
+    {
+      "resources": ["utils/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

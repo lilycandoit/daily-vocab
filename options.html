@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Vocab - Settings</title>
+  <style>
+    /* Use the same popup.css variables and base styles */
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+      --error-color: #e74c3c;
+      --background-color: #ffffff;
+      --surface-color: #f8f9fa;
+      --border-color: #e9ecef;
+      --text-color: #2c3e50;
+      --text-muted: #6c757d;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --radius: 8px;
+      --transition: all 0.2s ease;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background-color: #1a1a1a;
+        --surface-color: #2d2d2d;
+        --border-color: #404040;
+        --text-color: #e0e0e0;
+        --text-muted: #999;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      width: 500px;
+      max-height: 700px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-height: 700px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), #2980b9);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      background-color: var(--surface-color);
+      padding: 20px;
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-group .help-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      background: var(--background-color);
+      color: var(--text-color);
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    select.form-control {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%236c757d' height='12' viewBox='0 0 12 12' width='12'%3E%3Cpath d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 0 0 0 .293.707l5 5a1 1 0 0 0 0 1.414 0l5-5a1 1 0 0 0 0-1.414-1.414z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+      padding-right: 36px;
+      appearance: none;
+    }
+
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .radio-option, .checkbox-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .radio-option:hover, .checkbox-option:hover {
+      background-color: var(--border-color);
+    }
+
+    input[type="radio"], input[type="checkbox"] {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .time-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-input input {
+      flex: 1;
+    }
+
+    .range-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .range-group input[type="range"] {
+      flex: 1;
+    }
+
+    .range-value {
+      min-width: 60px;
+      text-align: center;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    .buttons {
+      padding: 20px;
+      background: var(--background-color);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn {
+      background: var(--background-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-color);
+    }
+
+    .btn:hover {
+      background: var(--surface-color);
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+      border-color: #21618c;
+    }
+
+    .btn-danger {
+      background: var(--error-color);
+      color: white;
+      border-color: var(--error-color);
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+      border-color: #a93226;
+    }
+
+    .stats-preview {
+      background: var(--background-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: var(--surface-color);
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-left: 8px;
+    }
+
+    .status-success {
+      background: rgba(39, 174, 96, 0.1);
+      color: var(--success-color);
+    }
+
+    .status-error {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--error-color);
+    }
+
+    .language-info {
+      background: var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .language-info code {
+      background: var(--primary-color);
+      color: white;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>
+        <span>⚙️</span>
+        Settings
+      </h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Language Settings -->
+      <section class="section">
+        <h2 class="section-title">🌍 Language Settings</h2>
+        
+        <div class="form-group">
+          <label for="userLanguage">Native Language</label>
+          <select id="userLanguage" class="form-control">
+            <option value="vi">Vietnamese (Tiếng Việt)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="th">Thai (ไทย)</option>
+            <option value="tl">Tagalog</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="nl">Dutch (Nederlands)</option>
+            <option value="sv">Swedish (Svenska)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+            <option value="ur">Urdu (اردو)</option>
+          </select>
+          <div class="help-text">
+            Choose your native language for phrase translations. Words will be translated to this language.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="maxPhraseLength">Maximum Phrase Length</label>
+          <div class="range-group">
+            <input type="range" id="maxPhraseLength" min="10" max="100" value="50" class="form-control">
+            <span class="range-value" id="phraseLengthValue">50 words</span>
+          </div>
+          <div class="help-text">
+            Maximum number of words allowed for phrase translations.
+          </div>
+        </div>
+      </section>
+
+      <!-- Word Selection -->
+      <section class="section">
+        <h2 class="section-title">🎯 Word Selection</h2>
+        
+        <div class="form-group">
+          <label>Selection Method</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="selectionMethod" value="double-click">
+              <span>Double-click (default)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="selectionMethod" value="selection">
+              <span>Text selection</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="selectionMethod" value="shortcut">
+              <span>Keyboard shortcut (Ctrl+Shift+D)</span>
+            </label>
+          </div>
+          <div class="help-text">
+            Choose how you want to select words while reading.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tooltipPosition">Tooltip Position</label>
+          <select id="tooltipPosition" class="form-control">
+            <option value="auto">Auto (recommended)</option>
+            <option value="above">Above text</option>
+            <option value="below">Below text</option>
+          </select>
+          <div class="help-text">
+            Where the pronunciation tooltip appears relative to the selected word.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="autoDismiss">Auto-dismiss Tooltip</label>
+          <div class="range-group">
+            <input type="range" id="autoDismiss" min="0" max="10000" value="3000" step="500" class="form-control">
+            <span class="range-value" id="autoDismissValue">3.0s</span>
+          </div>
+          <div class="help-text">
+            Time before tooltip automatically disappears (0 = never auto-dismiss).
+          </div>
+        </div>
+      </section>
+
+      <!-- Audio Settings -->
+      <section class="section">
+        <h2 class="section-title">🔊 Audio Settings</h2>
+        
+        <div class="form-group">
+          <label for="audioBehavior">Audio Playback</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="audioBehavior" value="click">
+              <span>Click to play (default)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="audioBehavior" value="hover">
+              <span>Hover to play</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="audioBehavior" value="disabled">
+              <span>Disabled</span>
+            </label>
+          </div>
+          <div class="help-text">
+            How audio pronunciation should be triggered.
+          </div>
+        </div>
+      </section>
+
+      <!-- Review Settings -->
+      <section class="section">
+        <h2 class="section-title">📚 Review Settings</h2>
+        
+        <div class="form-group">
+          <label>Default View</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="viewMode" value="cards">
+              <span>Cards (default)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="viewMode" value="list">
+              <span>List</span>
+            </label>
+          </div>
+          <div class="help-text">
+            Default display style for your word review interface.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="groupBy">Default Sorting</label>
+          <select id="groupBy" class="form-control">
+            <option value="date">Date Added (newest first)</option>
+            <option value="alphabetical">Alphabetical</option>
+            <option value="type">Word Type</option>
+          </select>
+          <div class="help-text">
+            How words are sorted by default in the review interface.
+          </div>
+        </div>
+      </section>
+
+      <!-- Daily Reminders -->
+      <section class="section">
+        <h2 class="section-title">⏰ Daily Reminders</h2>
+        
+        <div class="form-group">
+          <div class="checkbox-option">
+            <input type="checkbox" id="reminderEnabled">
+            <span>Enable daily reminders at 9 PM</span>
+          </div>
+          <div class="help-text">
+            Get notified daily to review your vocabulary before bed.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reminderTime">Reminder Time</label>
+          <div class="time-input">
+            <input type="time" id="reminderTime" class="form-control">
+          </div>
+          <div class="help-text">
+            What time you receive daily review reminders (default: 9:00 PM).
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-option">
+            <input type="checkbox" id="includeWeekends">
+            <span>Include weekends</span>
+          </div>
+          <div class="help-text">
+            Send reminders on Saturday and Sunday as well.
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Management -->
+      <section class="section">
+        <h2 class="section-title">📊 Data Management</h2>
+        
+        <div class="form-group">
+          <label for="maxWords">Maximum Words</label>
+          <div class="range-group">
+            <input type="range" id="maxWords" min="50" max="500" value="200" step="50" class="form-control">
+            <span class="range-value" id="maxWordsValue">200</span>
+          </div>
+          <div class="help-text">
+            Maximum number of words to store. Older words will be removed when limit is reached.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-option">
+            <input type="checkbox" id="enableCache">
+            <span>Enable caching for better performance</span>
+          </div>
+          <div class="help-text">
+            Cache frequently accessed words to improve loading times.
+          </div>
+        </div>
+
+        <div class="stats-preview">
+          <h3>Current Storage Usage</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="currentWordsCount">-</div>
+              <div class="stat-label">Words Saved</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="storageUsed">-</div>
+              <div class="stat-label">Storage Used</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Debug Info -->
+      <section class="section">
+        <h2 class="section-title">🔧 Debug Information</h2>
+        
+        <div class="language-info">
+          <strong>Supported Languages:</strong>
+          <p>This extension uses LibreTranslate for phrase translations. Currently supported languages include:</p>
+          <ul style="margin: 8px 0; padding-left: 20px; line-height: 1.6;">
+            <li>Vietnamese, Spanish, French, German, Chinese, Japanese, Korean</li>
+            <li>Portuguese, Russian, Arabic, Hindi, Thai, Tagalog</li>
+            <li>Italian, Dutch, Swedish, Polish, Turkish, Ukrainian</li>
+            <li>And many more - see <code>language code</code> in export data</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Buttons -->
+    <div class="buttons">
+      <button class="btn btn-primary" id="saveBtn">
+        <span>💾</span>
+        Save Settings
+      </button>
+      <button class="btn" id="resetBtn">
+        <span>🔄</span>
+        Reset to Defaults
+      </button>
+      <button class="btn btn-danger" id="clearDataBtn">
+        <span>🗑</span>
+        Clear All Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="utils/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

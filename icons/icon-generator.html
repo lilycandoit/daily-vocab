@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 20px; font-family: Arial, sans-serif; }
+    .icon { display: inline-block; margin: 10px; text-align: center; }
+    .icon img { display: block; }
+  </style>
+</head>
+<body>
+  <h1>Daily Vocab - Icon Generation</h1>
+  
+  <div class="icon">
+    <h3>16x16</h3>
+    <canvas id="icon16" width="16" height="16"></canvas>
+  </div>
+  
+  <div class="icon">
+    <h3>48x48</h3>
+    <canvas id="icon48" width="48" height="48"></canvas>
+  </div>
+  
+  <div class="icon">
+    <h3>128x128</h3>
+    <canvas id="icon128" width="128" height="128"></canvas>
+  </div>
+
+  <script>
+    function createIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, size);
+      gradient.addColorStop(0, '#3498db');
+      gradient.addColorStop(1, '#2980b9');
+      
+      // Draw rounded rectangle background
+      const radius = size * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size - radius);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      
+      // Add white book/book symbol
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size / 32;
+      
+      // Draw book shape
+      const bookWidth = size * 0.4;
+      const bookHeight = size * 0.5;
+      const bookX = (size - bookWidth) / 2;
+      const bookY = (size - bookHeight) / 2;
+      
+      // Book cover
+      ctx.fillRect(bookX, bookY, bookWidth, bookHeight);
+      
+      // Book spine
+      ctx.beginPath();
+      ctx.moveTo(bookX + bookWidth * 0.3, bookY);
+      ctx.lineTo(bookX + bookWidth * 0.3, bookY + bookHeight);
+      ctx.stroke();
+      
+      // Add text "ABC" or similar for language learning
+      ctx.font = `bold ${size * 0.1}px Arial`;
+      ctx.fillText('📚', bookX + bookWidth * 0.25, bookY + bookHeight * 0.3);
+      
+      // Add small star for daily practice
+      ctx.font = `${size * 0.08}px Arial`;
+      ctx.fillText('⭐', bookX + bookWidth * 0.7, bookY + bookHeight * 0.1);
+      
+      // Download as PNG
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon${size}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+    
+    // Generate all icons
+    setTimeout(() => {
+      createIcon('icon16', 16);
+    }, 100);
+    
+    setTimeout(() => {
+      createIcon('icon48', 48);
+    }, 200);
+    
+    setTimeout(() => {
+      createIcon('icon128', 128);
+    }, 300);
+  </script>
+</body>
+</html>

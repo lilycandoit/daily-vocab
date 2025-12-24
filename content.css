@@ -1,0 +1,344 @@
+/* Daily Vocab Content Script Styles */
+
+/* Tooltip container */
+.daily-vocab-tooltip {
+  display: none;
+  max-width: 320px;
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  z-index: 10000;
+  overflow: hidden;
+}
+
+/* Tooltip content */
+.dv-tooltip-content {
+  padding: 12px;
+}
+
+.dv-tooltip-content.dv-error {
+  text-align: center;
+}
+
+/* Word text */
+.dv-word-text {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2c3e50;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+/* Word type indicator */
+.dv-word-type {
+  font-size: 12px;
+  color: #7f8c8d;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+/* IPA pronunciation */
+.dv-ipa {
+  font-family: 'Lucida Sans Unicode', 'Arial Unicode MS', sans-serif;
+  font-size: 14px;
+  color: #3498db;
+  margin-bottom: 6px;
+  padding: 2px 0;
+}
+
+/* Translation */
+.dv-translation {
+  font-size: 14px;
+  color: #27ae60;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* Meaning/Definition */
+.dv-meaning {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+/* Actions container */
+.dv-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ecf0f1;
+  justify-content: flex-end;
+}
+
+/* Buttons */
+.dv-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  line-height: 1;
+}
+
+.dv-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+}
+
+.dv-btn:active {
+  transform: translateY(0);
+  background: #dee2e6;
+}
+
+/* Specific button styles */
+.dv-btn-audio {
+  background: #3498db;
+  color: white;
+  border-color: #2980b9;
+}
+
+.dv-btn-audio:hover {
+  background: #2980b9;
+  border-color: #21618c;
+}
+
+.dv-btn-save {
+  background: #27ae60;
+  color: white;
+  border-color: #229954;
+}
+
+.dv-btn-save:hover {
+  background: #229954;
+  border-color: #1e8449;
+}
+
+.dv-btn-close {
+  background: #e74c3c;
+  color: white;
+  border-color: #c0392b;
+}
+
+.dv-btn-close:hover {
+  background: #c0392b;
+  border-color: #a93226;
+}
+
+/* Error state */
+.dv-error-message {
+  color: #e74c3c;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.dv-error .dv-actions {
+  justify-content: center;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .daily-vocab-tooltip {
+    background: #2c3e50;
+    border-color: #34495e;
+    color: #ecf0f1;
+  }
+  
+  .dv-word-text {
+    color: #ecf0f1;
+  }
+  
+  .dv-word-type {
+    color: #95a5a6;
+  }
+  
+  .dv-ipa {
+    color: #5dade2;
+  }
+  
+  .dv-translation {
+    color: #58d68d;
+  }
+  
+  .dv-meaning {
+    color: #bdc3c7;
+  }
+  
+  .dv-actions {
+    border-top-color: #34495e;
+  }
+  
+  .dv-btn {
+    background: #34495e;
+    border-color: #4a5f7a;
+    color: #ecf0f1;
+  }
+  
+  .dv-btn:hover {
+    background: #4a5f7a;
+    border-color: #5a6f8a;
+  }
+  
+  .dv-error-message {
+    color: #ec7063;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .daily-vocab-tooltip {
+    border-width: 2px;
+    border-color: #000;
+  }
+  
+  .dv-btn {
+    border-width: 2px;
+    border-color: #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .daily-vocab-tooltip {
+    transition: none;
+  }
+  
+  .dv-btn {
+    transition: none;
+  }
+  
+  .dv-btn:hover {
+    transform: none;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .daily-vocab-tooltip {
+    max-width: 280px;
+    margin: 0 8px;
+  }
+  
+  .dv-tooltip-content {
+    padding: 10px;
+  }
+  
+  .dv-word-text {
+    font-size: 15px;
+  }
+  
+  .dv-actions {
+    gap: 4px;
+  }
+  
+  .dv-btn {
+    min-width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+}
+
+/* Small screen adjustments */
+@media (max-width: 320px) {
+  .daily-vocab-tooltip {
+    max-width: 260px;
+  }
+  
+  .dv-word-text {
+    font-size: 14px;
+  }
+  
+  .dv-ipa,
+  .dv-translation,
+  .dv-meaning {
+    font-size: 12px;
+  }
+}
+
+/* Animation classes */
+.daily-vocab-tooltip.fade-in {
+  animation: dvFadeIn 0.2s ease-in-out;
+}
+
+.daily-vocab-tooltip.fade-out {
+  animation: dvFadeOut 0.2s ease-in-out;
+}
+
+@keyframes dvFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dvFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+/* Focus styles for accessibility */
+.dv-btn:focus,
+.daily-vocab-tooltip:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.dv-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #7f8c8d;
+}
+
+.dv-loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ecf0f1;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: dvSpin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes dvSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success feedback */
+.dv-save-success {
+  background: #d5f4e6 !important;
+  border-color: #27ae60 !important;
+}
+
+.dv-save-success .dv-word-text {
+  color: #27ae60 !important;
+}
