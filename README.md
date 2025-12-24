@@ -1,4 +1,4 @@
-# Daily Vocab - Pronunciation & Translation Extension
+# Daily Vocab — A Minimal Chrome Extension for Pronunciation & Vocabulary Review
 
 > A minimal Chrome extension for non-native English speakers to quickly check pronunciation while reading, with intentional vocabulary review.
 
@@ -8,9 +8,9 @@
 
 ## 🎯 Purpose
 
-Built for Vietnamese learners in Australia who need quick pronunciation confirmation while reading English content, without heavy translation popups that break reading flow.
+Built for non-native English speakers who want quick pronunciation confirmation while reading English content, without heavy translation popups that break reading flow.
 
-**Core Philosophy**: Separate quick lookup (pronunciation) from deep review (AI-powered learning).
+**Core Philosophy**: Separate quick lookup (pronunciation) from deep review (AI-powered learning later).
 
 ## ✨ Features
 
@@ -46,6 +46,16 @@ git clone https://github.com/yourusername/daily-vocab.git
 cd daily-vocab
 # Open chrome://extensions/ and load unpacked
 ```
+
+## 🧭 How to Use Daily Vocab Effectively
+
+1. **Read normally** — Double-click unfamiliar words to check pronunciation
+2. **Save useful words** with one click (💾 button in tooltip)
+3. **Review your list** anytime in the popup (we'll remind you at 9 PM daily if you're busy)
+4. **Export your word list** with pre-designed prompts to send to ChatGPT or your favorite AI for deep explanations
+5. **Repeat daily** for consistent progress
+
+> **Pro tip**: Don't save too many words at once! Focus on 10-20 words per day for better retention.
 
 ## � Usage
 
@@ -117,15 +127,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Built with ❤️ for Vietnamese learners in Australia
+- Built this for my learning English journey, in my own way, hope it can help a bit!
 - Dictionary data from [Free Dictionary API](https://dictionaryapi.dev/)
 - Translation powered by [LibreTranslate](https://libretranslate.com/)
 
 ## 📧 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/daily-vocab/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/daily-vocab/discussions)
+- **Issues**: [GitHub Issues](https://github.com/lilycandoit/daily-vocab/issues)
 
 ---
-
-**Made for learners who want to understand pronunciation, not just meaning.** �

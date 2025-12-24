@@ -13,6 +13,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     // Set up daily alarm for 9 PM
     await setupDailyAlarm();
 
+    // Mark as first-time user to show welcome guide
+    await chrome.storage.sync.set({ firstTimeUser: true });
+
     console.log('Daily Vocab extension installed successfully');
   }
 });

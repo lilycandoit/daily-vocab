@@ -386,15 +386,30 @@ class DailyVocabContent {
   }
 
   playAudio(audioUrl) {
-    if (!audioUrl || !this.audioElement) return;
+    if (!audioUrl) {
+      console.log('No audio available for this word');
+      return;
+    }
+
+    if (!this.audioElement) {
+      console.error('Audio element not initialized');
+      return;
+    }
 
     try {
       // Format audio URL
       const formattedUrl = WordAPI.getAudioUrl(audioUrl);
 
+      if (!formattedUrl) {
+        console.log('No valid audio URL');
+        return;
+      }
+
       this.audioElement.src = formattedUrl;
       this.audioElement.play().catch(error => {
         console.error('Error playing audio:', error);
+        // Don't show alert for audio errors - just log it
+        // Some words don't have audio available
       });
     } catch (error) {
       console.error('Error setting up audio:', error);
@@ -409,11 +424,20 @@ class DailyVocabContent {
       // Get page information
       const pageInfo = this.getPageInfo();
 
-      // Prepare word data for saving
+      // Prepare word data for saving - ONLY save essential data to avoid quota issues
       const wordToSave = {
-        ...wordData,
+        text: wordData.text,
+        type: wordData.type,
+        ipa: wordData.ipa || '',
+        audio: wordData.audio || '',
+        translation: wordData.translation || '',
+        meaning: wordData.meaning || '',
         context: context,
-        source: pageInfo
+        source: {
+          url: pageInfo.url,
+          title: pageInfo.title.substring(0, 100), // Limit title length
+          domain: pageInfo.domain
+        }
       };
 
       // Save word via background script
@@ -430,6 +454,11 @@ class DailyVocabContent {
     } catch (error) {
       if (error.message && error.message.includes('Extension context invalidated')) {
         console.log('Daily Vocab: Extension context invalidated. Please refresh the page.');
+        return;
+      }
+      if (error.message && error.message.includes('quota exceeded')) {
+        console.error('Storage quota exceeded. Try deleting some old words.');
+        alert('Storage full! Please delete some old words in the popup.');
         return;
       }
       console.error('Error saving word:', error);

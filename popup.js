@@ -28,6 +28,9 @@ class DailyVocabPopup {
       // Update statistics display
       this.updateStats();
 
+      // Check if first-time user and show welcome guide
+      await this.checkFirstTimeUser();
+
       this.isInitialized = true;
       console.log('Daily Vocab popup initialized');
     } catch (error) {
@@ -106,6 +109,10 @@ class DailyVocabPopup {
     });
 
     // Footer links
+    document.getElementById('howToUseLinkBtn').addEventListener('click', () => {
+      this.showHowToUseModal();
+    });
+
     document.getElementById('settingsBtn').addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
     });
@@ -732,6 +739,20 @@ class DailyVocabPopup {
       }
     } catch (error) {
       console.error('Error updating setting:', error);
+    }
+  }
+
+  async checkFirstTimeUser() {
+    try {
+      const result = await chrome.storage.sync.get('firstTimeUser');
+      if (result.firstTimeUser === true) {
+        // Show welcome modal
+        this.showHowToUseModal();
+        // Clear the flag so it doesn't show again
+        await chrome.storage.sync.set({ firstTimeUser: false });
+      }
+    } catch (error) {
+      console.error('Error checking first-time user:', error);
     }
   }
 

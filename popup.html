@@ -49,7 +49,7 @@
               <span class="icon">📋</span>
             </button>
           </div>
-          
+
           <div class="sort-controls">
             <label for="sortSelect">Sort:</label>
             <select class="sort-select" id="sortSelect">
@@ -58,7 +58,7 @@
               <option value="type">Word Type</option>
             </select>
           </div>
-          
+
           <div class="search-controls">
             <input type="text" class="search-input" id="searchInput" placeholder="Search words...">
             <button class="btn btn-secondary search-btn" id="searchBtn" title="Search">
@@ -99,8 +99,10 @@
           Complete Review
         </button>
       </div>
-      
+
       <div class="footer-links">
+        <button class="link-btn" id="howToUseLinkBtn">How to Use</button>
+        <span class="separator">•</span>
         <button class="link-btn" id="settingsBtn">Settings</button>
         <span class="separator">•</span>
         <button class="link-btn" id="statsBtn">Statistics</button>
@@ -115,7 +117,7 @@
         <h3>Export Words for AI Review</h3>
         <button class="modal-close" id="exportModalClose">&times;</button>
       </div>
-      
+
       <div class="modal-body">
         <div class="export-options">
           <label for="promptSelect">Choose Prompt Template:</label>
@@ -126,7 +128,7 @@
             <option value="context-examples">Context Examples</option>
           </select>
         </div>
-        
+
         <div class="export-preview">
           <label>Preview:</label>
           <div class="preview-content" id="previewContent">
@@ -134,7 +136,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button class="btn btn-secondary" id="copyExportBtn">Copy to Clipboard</button>
         <button class="btn btn-primary" id="openChatGBtn">Open ChatGPT</button>
@@ -149,7 +151,7 @@
         <h3>Learning Statistics</h3>
         <button class="modal-close" id="statsModalClose">&times;</button>
       </div>
-      
+
       <div class="modal-body">
         <div class="stats-grid">
           <div class="stat-item">
@@ -169,7 +171,7 @@
             <div class="stat-label">Unreviewed</div>
           </div>
         </div>
-        
+
         <div class="storage-info">
           <h4>Storage Usage</h4>
           <div class="storage-bar">
@@ -178,7 +180,7 @@
           <div class="storage-text" id="storageText">Calculating...</div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button class="btn btn-secondary" id="clearAllBtn">Clear All Words</button>
         <button class="btn btn-primary" id="exportDataBtn">Export Data</button>
@@ -193,7 +195,7 @@
         <h3>How to Use Daily Vocab</h3>
         <button class="modal-close" id="howToUseModalClose">&times;</button>
       </div>
-      
+
       <div class="modal-body">
         <div class="instructions">
           <div class="instruction-item">
@@ -202,29 +204,29 @@
               <strong>Double-click</strong> any word while reading to see its pronunciation and translation.
             </div>
           </div>
-          
+
           <div class="instruction-item">
             <div class="instruction-number">2</div>
             <div class="instruction-text">
               Click the <strong>💾 save button</strong> to add words to your review list.
             </div>
           </div>
-          
+
           <div class="instruction-item">
             <div class="instruction-number">3</div>
             <div class="instruction-text">
-              Open this popup at <strong>9 PM daily</strong> to review your saved words.
+              Open this popup <strong>anytime</strong> to review your saved words (we'll remind you at <strong>9 PM daily</strong> if you're busy).
             </div>
           </div>
-          
+
           <div class="instruction-item">
             <div class="instruction-number">4</div>
             <div class="instruction-text">
-              <strong>Export</strong> words to ChatGPT or your favorite AI for deep explanations.
+              <strong>Export</strong> your word list with pre-designed prompts to send to ChatGPT or your favorite AI for deep explanations.
             </div>
           </div>
         </div>
-        
+
         <div class="tips">
           <h4>Tips:</h4>
           <ul>
@@ -235,7 +237,7 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button class="btn btn-primary" id="startUsingBtn">Start Using</button>
       </div>
