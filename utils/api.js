@@ -13,8 +13,21 @@ class WordAPI {
     const words = trimmedText.split(/\s+/);
 
     if (words.length === 1) {
-      // Single word - use dictionary API for IPA and audio
-      return await this.getSingleWordData(trimmedText);
+      // Single word - fetch BOTH dictionary data AND translation
+      const wordData = await this.getSingleWordData(trimmedText);
+
+      try {
+        // Only fetch translation if target language is NOT English
+        if (userLanguage !== 'en') {
+          const transResult = await this.getPhraseTranslation(trimmedText, userLanguage);
+          wordData.translation = transResult.translation;
+        }
+      } catch (error) {
+        console.warn('Daily Vocab: Single word translation failed:', error);
+        // We still return wordData as it has the dictionary info
+      }
+
+      return wordData;
     } else if (words.length <= 50) {
       // Phrase - use translation API
       return await this.getPhraseTranslation(trimmedText, userLanguage);
@@ -110,43 +123,37 @@ class WordAPI {
     }
   }
 
-  // Get phrase translation from LibreTranslate
+  // Get phrase translation using Google's reliable internal endpoint
   static async getPhraseTranslation(phrase, targetLanguage) {
     try {
-      const response = await fetch('https://libretranslate.com/translate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          q: phrase,
-          source: 'en',
-          target: targetLanguage,
-          format: 'text'
-        })
-      });
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(phrase)}`;
+
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Translation API error: ${response.status}`);
+        throw new Error('Google Translation error');
       }
 
       const data = await response.json();
 
-      if (!data.translatedText) {
-        throw new Error('Translation failed');
+      // Google returns a nested array: [[["translation", "source", ...]]]
+      if (data && data[0] && data[0][0] && data[0][0][0]) {
+        // Concatenate all parts of the translation (Google might split long phrases)
+        const translation = data[0].map(part => part[0]).join('');
+
+        return {
+          text: phrase,
+          type: 'phrase',
+          translation: translation,
+          sourceLanguage: 'en',
+          targetLanguage: targetLanguage
+        };
       }
 
-      return {
-        text: phrase,
-        type: 'phrase',
-        translation: data.translatedText,
-        sourceLanguage: 'en',
-        targetLanguage: targetLanguage
-      };
-
+      throw new Error('Invalid translation format');
     } catch (error) {
-      console.error('Error fetching phrase translation:', error);
-      throw new Error(`Failed to translate phrase: ${error.message}`);
+      console.error('Error in Google Translation:', error);
+      throw new Error('Translation service currently busy. Please try again.');
     }
   }
 

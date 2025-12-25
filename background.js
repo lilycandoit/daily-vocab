@@ -1,9 +1,7 @@
-// Background service worker for Daily Vocab extension
-// Handles word processing, storage, alarms, and notifications
-
 // Import utilities
 importScripts('utils/storage.js');
 importScripts('utils/api.js');
+importScripts('utils/cache.js');
 
 // handle migration of data from sync to local as sync is too small (8KB limit)
 async function migrateStorage() {
@@ -78,6 +76,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       periodInMinutes: 1440
     });
   } else if (details.reason === 'update') {
+    // Clear cache on update to ensure new features/logic work correctly
+    await WordCache.clearCache();
+
     // Update existing settings if they are using the old 3s timeout
     const settingsResult = await chrome.storage.sync.get('settings');
     if (settingsResult.settings && settingsResult.settings.autoDismiss === 3000) {

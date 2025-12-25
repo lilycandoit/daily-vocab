@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Daily Vocab - Pronunciation & Translation",
+  "name": "Pronunciation & Vocabulary Review — Daily Vocab",
+  "short_name": "Daily Vocab",
   "version": "1.0.0",
   "description": "Minimal extension for pronunciation confirmation and intentional vocabulary review with native language translations",
 
@@ -14,7 +15,7 @@
 
   "host_permissions": [
     "https://api.dictionaryapi.dev/*",
-    "https://libretranslate.com/*",
+    "https://translate.googleapis.com/*",
     "https://type.fit/*"
   ],
 

@@ -111,16 +111,19 @@ class DailyVocabContent {
 
   handleTextSelection(event) {
     const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
     const selectedText = selection.toString().trim();
 
     if (selectedText && this.isValidText(selectedText)) {
-      // Small delay to ensure selection is complete
-      setTimeout(() => {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
+      // CAPTURE selection range immediately before it can be cleared by clicks
+      const range = selection.getRangeAt(0).cloneRange();
 
+      // Small delay to let the browser finalize the selection UI
+      setTimeout(() => {
+        const rect = range.getBoundingClientRect();
         this.showTooltip(selectedText, rect);
-      }, 100);
+      }, 50);
     }
   }
 
@@ -148,7 +151,7 @@ class DailyVocabContent {
   }
 
   handleDocumentClick(event) {
-    if (this.isVisible && !this.tooltip.contains(event.target)) {
+    if (this.isVisible && this.tooltip && !this.tooltip.contains(event.target)) {
       this.hideTooltip();
     }
   }
@@ -250,15 +253,15 @@ class DailyVocabContent {
     let top, left;
 
     // Determine vertical position
-    const spaceAbove = rect.top - scrollY;
-    const spaceBelow = viewportHeight - rect.bottom - scrollY;
+    const spaceAbove = rect.top; // Space in viewport above the text
+    const spaceBelow = viewportHeight - rect.bottom; // Space in viewport below the text
 
     if (spaceBelow >= tooltipRect.height + 10) {
       // Position below the text
-      top = rect.bottom + scrollY + 5;
+      top = rect.bottom + scrollY + 2; // Closer spacing
     } else if (spaceAbove >= tooltipRect.height + 10) {
       // Position above the text
-      top = rect.top + scrollY - tooltipRect.height - 5;
+      top = rect.top + scrollY - tooltipRect.height - 2; // Closer spacing
     } else {
       // Not enough space, position at viewport edge
       top = scrollY + 10;
