@@ -663,10 +663,11 @@ class DailyVocabPopup {
     try {
       const storageUsage = await StorageManager.getStorageUsage();
       if (storageUsage) {
-        const percentage = Math.min((storageUsage.total / 102400) * 100, 100); // 100KB limit
+        const MAX_STORAGE = 5 * 1024 * 1024; // 5MB local storage limit
+        const percentage = Math.min((storageUsage.total / MAX_STORAGE) * 100, 100);
         document.getElementById('storageFill').style.width = `${percentage}%`;
         document.getElementById('storageText').textContent =
-          `${Math.round(storageUsage.total / 1024)}KB used (${Math.round(percentage)}%)`;
+          `${Math.round(storageUsage.total / 1024)}KB used of 5MB (${Math.round(percentage)}%)`;
       }
     } catch (error) {
       document.getElementById('storageText').textContent = 'Storage info unavailable';

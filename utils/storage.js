@@ -79,13 +79,13 @@ class StorageManager {
 
   // Get all words
   static async getWords() {
-    const result = await this.get('words');
+    const result = await this.getLocal('words');
     return result.words || [];
   }
 
   // Save words array
   static async saveWords(words) {
-    return await this.set({ words });
+    return await this.setLocal({ words });
   }
 
   // Add single word
@@ -275,7 +275,7 @@ class StorageManager {
 
   // Get statistics
   static async getStatistics() {
-    const result = await this.get('statistics');
+    const result = await this.getLocal('statistics');
     return result.statistics || {};
   }
 
@@ -283,8 +283,12 @@ class StorageManager {
   static async updateStatistics(newStats) {
     const currentStats = await this.getStatistics();
     const updatedStats = { ...currentStats, ...newStats };
+    return await this.setLocal({ statistics: updatedStats });
+  }
 
-    return await this.set({ statistics: updatedStats });
+  // Clear all statistics
+  static async clearStatistics() {
+    return await this.removeLocal('statistics');
   }
 
   // Calculate and update statistics
