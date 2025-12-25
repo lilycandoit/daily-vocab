@@ -141,17 +141,19 @@ Please explain these words with Australian English usage examples, phonetics, an
 **Tooltip not appearing?**
 - Make sure you've reloaded the webpage after installing/updating the extension
 - Check that the extension is enabled in `chrome://extensions/`
+- Tooltips are disabled on some secure Chrome system pages (like Settings or the New Tab page)
 
 **No saved words showing?**
 - Click the 💾 save button in the tooltip (double-clicking only shows the tooltip)
 
 **Audio not playing?**
-- Some words don't have audio in the dictionary API
-- Check your browser's sound settings
+- We use a special background system to play audio on highly secure sites like Notion and ChatGPT.
+- If it fails, it usually means the external dictionary doesn't have a recording for that specific word.
+- The pronunciation (IPA) is always displayed in the tooltip as a fallback.
 
 **Extension not working after update?**
 - Reload the extension in `chrome://extensions/`
-- Refresh all open webpages
+- Refresh all open webpages (this is required to load the new logic)
 
 ---
 

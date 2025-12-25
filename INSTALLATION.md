@@ -22,17 +22,9 @@ The Daily Vocab extension is **complete and ready to use!** All core functionali
 5. **Select the `daily-vocab` folder** (the one containing manifest.json)
 6. **Pin the extension** (right-click icon → "Pin")
 
-### Method 2: Create Icons (Optional)
-If you want custom icons:
-
-1. **Generate icons**:
-   - Open `create-icons.html` in your browser
-   - Click the buttons to generate 16x16, 48x48, and 128x128 icons
-   - Save the generated PNG files to the `icons/` folder
-
-2. **Or use the SVG**:
-   - The `icons/icon.svg` file is ready to use
-   - Convert to PNG using any image editor or online converter
+### Method 2: Check Icons
+1. Ensure the `icons/` folder contains exactly 3 PNG files: `icon16.png`, `icon48.png`, and `icon128.png`.
+2. These are included by default. If they are missing, the extension may not load correctly.
 
 ## 🎮 Quick Start Guide
 
@@ -114,16 +106,17 @@ Once you're comfortable, consider:
 
 ### Performance Tips
 - **Cache Enabled**: Improves loading for frequently accessed words
-- **Sync**: Words sync across devices with Chrome sync
+- **Sync**: Settings and preferences sync across devices with Chrome sync
+- **Vocabulary Storage**: All saved words are stored in `storage.local` to ensure high capacity (5MB+). Words are device-specific to maximize privacy and speed.
 - **Cleanup**: Regular export and deletion of old words
 
 ## 🚀 Ready to Go!
 
-Your Daily Vocab extension is now ready to enhance your vocabulary learning journey! 
+Your Daily Vocab extension is now ready to enhance your vocabulary learning journey!
 
 **Key Benefits**:
 - 🎯 Minimal distraction reading experience
-- 🌍 Native language support for phrases  
+- 🌍 Native language support for phrases
 - 🔊 Audio pronunciation for words
 - ⏰ Consistent daily review routine
 - 🤖 AI-powered deep learning integration

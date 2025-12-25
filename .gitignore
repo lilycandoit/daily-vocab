@@ -27,10 +27,10 @@ build/
 secrets.json
 
 # Development documentation (optional)
-FIX_SUMMARY.md
-POPUP_FIX.md
-ICON-FIX.md
-PUBLISHING.md
+CHROME_WEB_STORE_GUIDE.md
+SCREENSHOT_GUIDE.md
+SUBMISSION_CHECKLIST.md
+READY_TO_PUBLISH.md
 
 # Chrome extension package (generated when you pack the extension)
 *.crx

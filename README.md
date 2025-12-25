@@ -74,7 +74,8 @@ cd daily-vocab
 ```
 daily-vocab/
 ├── manifest.json          # Extension configuration (Manifest V3)
-├── background.js          # Service worker (API calls, alarms)
+├── background.js          # Service worker (proxy audio, manage alarms)
+├── offscreen.html/js      # Secure audio playback background context
 ├── content.js/css         # Word selection & tooltips
 ├── popup.html/js/css      # Review interface
 ├── options.html/js        # Settings page
@@ -88,7 +89,10 @@ daily-vocab/
 
 - **Manifest V3** (latest Chrome extension standard)
 - **Vanilla JavaScript** (no frameworks)
-- **Chrome Storage API** (sync across devices)
+- **Chrome Storage API**:
+  - `storage.sync`: Settings and preferences (sync across devices)
+  - `storage.local`: Vocabulary data and statistics (high capacity)
+- **Offscreen API**: Secure background audio playback (bypasses CSP)
 - **Free APIs**:
   - [Dictionary API](https://dictionaryapi.dev/) - IPA & definitions
   - [LibreTranslate](https://libretranslate.com/) - Phrase translation
