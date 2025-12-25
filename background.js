@@ -44,6 +44,7 @@ function getNextReminderTime(timeStr) {
 // Handle initialization
 chrome.runtime.onInstalled.addListener(async (details) => {
   await migrateStorage();
+  await updateStatistics();
 
   if (details.reason === 'install') {
     // Set default settings in sync storage (safe as it is small)
@@ -164,9 +165,7 @@ async function saveWord(wordData) {
   await saveWords(words);
 
   // Update stats
-  const stats = await getStatistics();
-  stats.totalSaved = (stats.totalSaved || 0) + 1;
-  await saveStatistics(stats);
+  await updateStatistics();
 }
 
 async function updateWord(wordId, updates) {
@@ -175,6 +174,7 @@ async function updateWord(wordId, updates) {
   if (index >= 0) {
     words[index] = { ...words[index], ...updates };
     await saveWords(words);
+    await updateStatistics();
   }
 }
 
@@ -182,6 +182,7 @@ async function deleteWord(wordId) {
   const words = await getWords();
   const filtered = words.filter(w => w.id !== wordId);
   await saveWords(filtered);
+  await updateStatistics();
 }
 
 async function markReviewComplete() {
@@ -302,6 +303,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         case 'clearAllWords':
           await saveWords([]);
+          await updateStatistics();
           sendResponse({ success: true });
           break;
 
