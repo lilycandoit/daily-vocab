@@ -166,12 +166,12 @@ class DailyVocabOptions {
     this.updateRangeValue('phraseLengthValue', this.settings.maxPhraseLength || 50, 'words');
 
     // Word selection settings
-    const selectionMethod = this.settings.selectionMethod || 'double-click';
+    const selectionMethod = this.settings.selectionMethod || 'selection';
     document.querySelector(`input[name="selectionMethod"][value="${selectionMethod}"]`).checked = true;
 
     document.getElementById('tooltipPosition').value = this.settings.tooltipPosition || 'auto';
-    document.getElementById('autoDismiss').value = this.settings.autoDismiss || 3000;
-    this.updateRangeValue('autoDismissValue', this.settings.autoDismiss || 3000, 's');
+    document.getElementById('autoDismiss').value = this.settings.autoDismiss || 5000;
+    this.updateRangeValue('autoDismissValue', (this.settings.autoDismiss || 5000) / 1000, 's');
 
     // Audio settings
     const audioBehavior = this.settings.audioBehavior || 'click';

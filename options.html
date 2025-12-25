@@ -340,7 +340,7 @@
       <!-- Language Settings -->
       <section class="section">
         <h2 class="section-title">🌍 Language Settings</h2>
-        
+
         <div class="form-group">
           <label for="userLanguage">Native Language</label>
           <select id="userLanguage" class="form-control">
@@ -385,17 +385,17 @@
       <!-- Word Selection -->
       <section class="section">
         <h2 class="section-title">🎯 Word Selection</h2>
-        
+
         <div class="form-group">
           <label>Selection Method</label>
           <div class="radio-group">
             <label class="radio-option">
               <input type="radio" name="selectionMethod" value="double-click">
-              <span>Double-click (default)</span>
+              <span>Double-click</span>
             </label>
             <label class="radio-option">
               <input type="radio" name="selectionMethod" value="selection">
-              <span>Text selection</span>
+              <span>Text selection (default)</span>
             </label>
             <label class="radio-option">
               <input type="radio" name="selectionMethod" value="shortcut">
@@ -422,8 +422,8 @@
         <div class="form-group">
           <label for="autoDismiss">Auto-dismiss Tooltip</label>
           <div class="range-group">
-            <input type="range" id="autoDismiss" min="0" max="10000" value="3000" step="500" class="form-control">
-            <span class="range-value" id="autoDismissValue">3.0s</span>
+            <input type="range" id="autoDismiss" min="0" max="10000" value="5000" step="500" class="form-control">
+            <span class="range-value" id="autoDismissValue">5.0s</span>
           </div>
           <div class="help-text">
             Time before tooltip automatically disappears (0 = never auto-dismiss).
@@ -434,7 +434,7 @@
       <!-- Audio Settings -->
       <section class="section">
         <h2 class="section-title">🔊 Audio Settings</h2>
-        
+
         <div class="form-group">
           <label for="audioBehavior">Audio Playback</label>
           <div class="radio-group">
@@ -460,7 +460,7 @@
       <!-- Review Settings -->
       <section class="section">
         <h2 class="section-title">📚 Review Settings</h2>
-        
+
         <div class="form-group">
           <label>Default View</label>
           <div class="radio-group">
@@ -494,7 +494,7 @@
       <!-- Daily Reminders -->
       <section class="section">
         <h2 class="section-title">⏰ Daily Reminders</h2>
-        
+
         <div class="form-group">
           <div class="checkbox-option">
             <input type="checkbox" id="reminderEnabled">
@@ -529,7 +529,7 @@
       <!-- Data Management -->
       <section class="section">
         <h2 class="section-title">📊 Data Management</h2>
-        
+
         <div class="form-group">
           <label for="maxWords">Maximum Words</label>
           <div class="range-group">
@@ -569,7 +569,7 @@
       <!-- Debug Info -->
       <section class="section">
         <h2 class="section-title">🔧 Debug Information</h2>
-        
+
         <div class="language-info">
           <strong>Supported Languages:</strong>
           <p>This extension uses LibreTranslate for phrase translations. Currently supported languages include:</p>
