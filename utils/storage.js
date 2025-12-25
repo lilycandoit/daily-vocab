@@ -7,6 +7,9 @@ class StorageManager {
     try {
       return await chrome.storage.sync.get(keys);
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return {};
+      }
       console.error('Error getting data from sync storage:', error);
       return {};
     }
@@ -18,6 +21,9 @@ class StorageManager {
       await chrome.storage.sync.set(data);
       return true;
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return false;
+      }
       console.error('Error setting data in sync storage:', error);
       return false;
     }
@@ -50,6 +56,9 @@ class StorageManager {
     try {
       return await chrome.storage.local.get(keys);
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return {};
+      }
       console.error('Error getting data from local storage:', error);
       return {};
     }
@@ -61,6 +70,9 @@ class StorageManager {
       await chrome.storage.local.set(data);
       return true;
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return false;
+      }
       console.error('Error setting data in local storage:', error);
       return false;
     }

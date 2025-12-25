@@ -52,7 +52,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       settings: {
         userLanguage: 'vi',
         selectionMethod: 'double-click',
-        autoDismiss: 3000,
+        autoDismiss: 5000,
         reminderEnabled: true,
         reminderTime: '21:00',
         maxWords: 200
@@ -77,6 +77,13 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       when: getNextReminderTime('21:00'),
       periodInMinutes: 1440
     });
+  } else if (details.reason === 'update') {
+    // Update existing settings if they are using the old 3s timeout
+    const settingsResult = await chrome.storage.sync.get('settings');
+    if (settingsResult.settings && settingsResult.settings.autoDismiss === 3000) {
+      settingsResult.settings.autoDismiss = 5000;
+      await chrome.storage.sync.set({ settings: settingsResult.settings });
+    }
   }
 });
 
@@ -231,6 +238,9 @@ async function playAudioBackground(audioUrl) {
       reasons: ['AUDIO_PLAYBACK'],
       justification: 'Play word pronunciation'
     });
+
+    // Give the offscreen document a moment to initialize its listeners
+    await new Promise(resolve => setTimeout(resolve, 200));
   }
 
   // Send message to offscreen document

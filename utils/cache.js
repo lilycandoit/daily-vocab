@@ -31,6 +31,9 @@ class WordCache {
 
       return cachedData.data;
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return null; // Silent failure for context invalidation
+      }
       console.error('Error getting cached item:', error);
       return null;
     }
@@ -56,6 +59,9 @@ class WordCache {
 
       return true;
     } catch (error) {
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        return false;
+      }
       console.error('Error setting cached item:', error);
       return false;
     }

@@ -35,7 +35,7 @@ class DailyVocabContent {
       userLanguage: 'vi',
       maxPhraseLength: 50,
       selectionMethod: 'double-click',
-      autoDismiss: 3000,
+      autoDismiss: 5000,
       tooltipPosition: 'auto'
     };
 
