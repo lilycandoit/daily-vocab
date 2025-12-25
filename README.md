@@ -95,7 +95,7 @@ daily-vocab/
 - **Offscreen API**: Secure background audio playback (bypasses CSP)
 - **Free APIs**:
   - [Dictionary API](https://dictionaryapi.dev/) - IPA & definitions
-  - [LibreTranslate](https://libretranslate.com/) - Phrase translation
+  - [Google Translate](https://translate.google.com/) (Primary) + [LibreTranslate](https://libretranslate.com/) (Fallback)
   - [Type.fit Quotes](https://type.fit/api/quotes) - Daily inspiration
 
 ## � Language Support
@@ -133,7 +133,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built this for my learning English journey, in my own way, hope it can help a bit!
 - Dictionary data from [Free Dictionary API](https://dictionaryapi.dev/)
-- Translation powered by [LibreTranslate](https://libretranslate.com/)
+- Translation powered by Google Translate and [LibreTranslate](https://libretranslate.com/)
 
 ## 📧 Support
 

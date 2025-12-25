@@ -16,6 +16,7 @@
   "host_permissions": [
     "https://api.dictionaryapi.dev/*",
     "https://translate.googleapis.com/*",
+    "https://translate.argosopentech.com/*",
     "https://type.fit/*"
   ],
 

@@ -123,38 +123,66 @@ class WordAPI {
     }
   }
 
-  // Get phrase translation using Google's reliable internal endpoint
+  // Get phrase translation with Google Translate as primary and Argos Open Tech as a safety net
   static async getPhraseTranslation(phrase, targetLanguage) {
+    // 1. Primary: Google Translate (gtx endpoint)
     try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(phrase)}`;
+      const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(phrase)}`;
+      const response = await fetch(gtxUrl);
 
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error('Google Translation error');
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data[0] && data[0][0] && data[0][0][0]) {
+          const translation = data[0].map(part => part[0]).join('');
+          return {
+            text: phrase,
+            type: 'phrase',
+            translation: translation,
+            sourceLanguage: 'en',
+            targetLanguage: targetLanguage,
+            engine: 'google'
+          };
+        }
       }
-
-      const data = await response.json();
-
-      // Google returns a nested array: [[["translation", "source", ...]]]
-      if (data && data[0] && data[0][0] && data[0][0][0]) {
-        // Concatenate all parts of the translation (Google might split long phrases)
-        const translation = data[0].map(part => part[0]).join('');
-
-        return {
-          text: phrase,
-          type: 'phrase',
-          translation: translation,
-          sourceLanguage: 'en',
-          targetLanguage: targetLanguage
-        };
-      }
-
-      throw new Error('Invalid translation format');
     } catch (error) {
-      console.error('Error in Google Translation:', error);
-      throw new Error('Translation service currently busy. Please try again.');
+      console.warn('Daily Vocab: Primary translation failed, trying safety net...', error);
     }
+
+    // 2. Safety Net: Argos Open Tech Mirror
+    try {
+      const mirrorUrl = 'https://translate.argosopentech.com/translate';
+      const response = await fetch(mirrorUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          q: phrase,
+          source: 'en',
+          target: targetLanguage,
+          format: 'text',
+          api_key: ''
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.translatedText) {
+          return {
+            text: phrase,
+            type: 'phrase',
+            translation: data.translatedText,
+            sourceLanguage: 'en',
+            targetLanguage: targetLanguage,
+            engine: 'fallback'
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Daily Vocab: Safety net translation failed:', error);
+    }
+
+    throw new Error('Translation service currently busy. Please try again in a moment.');
   }
 
   // Get supported languages from LibreTranslate
