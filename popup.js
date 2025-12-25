@@ -32,7 +32,6 @@ class DailyVocabPopup {
       await this.checkFirstTimeUser();
 
       this.isInitialized = true;
-      console.log('Daily Vocab popup initialized');
     } catch (error) {
       console.error('Error initializing popup:', error);
       this.showError('Failed to initialize popup');

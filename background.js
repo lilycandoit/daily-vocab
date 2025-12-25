@@ -76,8 +76,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       when: getNextReminderTime('21:00'),
       periodInMinutes: 1440
     });
-
-    console.log('Daily Vocab extension installed and initialized');
   }
 });
 

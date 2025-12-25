@@ -24,8 +24,6 @@ class DailyVocabContent {
 
       // Create audio element for pronunciation
       this.createAudioElement();
-
-      console.log('Daily Vocab content script initialized');
     } catch (error) {
       console.error('Error initializing content script:', error);
     }
@@ -398,8 +396,6 @@ class DailyVocabContent {
         action: 'playAudio',
         audioUrl: formattedUrl
       });
-
-      console.log('Audio playback requested via background');
     } catch (error) {
       console.error('Error requesting audio playback:', error);
     }
@@ -438,8 +434,6 @@ class DailyVocabContent {
       if (!response || !response.success) {
         throw new Error((response && response.error) || 'Failed to save word');
       }
-
-      console.log('Word saved successfully');
     } catch (error) {
       if (error.message && error.message.includes('Extension context invalidated')) {
         console.log('Daily Vocab: Extension context invalidated. Please refresh the page.');
