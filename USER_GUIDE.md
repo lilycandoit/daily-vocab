@@ -4,21 +4,21 @@
 
 ### 1. Saving Words While Reading
 
-**Method 1: Double-Click (Default)**
-- While reading any webpage, **double-click** any English word
-- A tooltip will appear showing:
-  - Pronunciation (IPA)
-  - Translation in your language
+**Method 1: Text Selection (Default)**
+- **Select any word or phrase** with your mouse
+- The tooltip will appear automatically with:
+  - Pronunciation (IPA) for single words
+  - Native translation in your language
   - Brief definition
   - 🔊 Audio button (click to hear pronunciation)
   - 💾 Save button (click to add to your review list)
 
-**Method 2: Text Selection**
-- Select a word or phrase
-- The tooltip appears automatically
+**Method 2: Double-Click**
+- While reading any webpage, **double-click** any English word
+- This is a faster way to trigger the tooltip for single words
 
 **Method 3: Keyboard Shortcut**
-- Select a word
+- Select a word or phrase
 - Press `Ctrl+Shift+D` (or `Cmd+Shift+D` on Mac)
 
 > You can change the selection method in Settings
