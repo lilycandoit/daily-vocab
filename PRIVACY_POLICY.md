@@ -53,9 +53,11 @@ The extension makes requests to the following free, public APIs to provide funct
    - Data sent: The word you look up
    - No personal data is sent
 
-2. **LibreTranslate** (https://libretranslate.com)
-   - Purpose: Translate phrases to your native language
-   - Data sent: The phrase you look up and target language
+2. **Google Translate & LibreTranslate Mirrors**
+   - Purpose: Translate phrases and words to your native language
+   - Primary: Google Translate (https://translate.googleapis.com)
+   - Fallback: Argos Open Tech (https://translate.argosopentech.com)
+   - Data sent: The text you look up and your target language
    - No personal data is sent
 
 3. **Type.fit Quotes API** (https://type.fit/api/quotes)
@@ -72,7 +74,7 @@ The extension requests the following permissions:
 ### Required Permissions
 
 - **storage**: To save your words, settings, and statistics locally on your device
-- **activeTab**: To read selected text when you double-click words on webpages
+- **activeTab**: To read selected text or double-click words on webpages
 - **alarms**: To schedule daily reminder notifications at 9 PM
 - **notifications**: To display daily reminder notifications
 - **offscreen**: To securely play audio pronunciation in a background context, ensuring it works on sites with strict security policies (like Notion and ChatGPT)
@@ -80,7 +82,8 @@ The extension requests the following permissions:
 ### Host Permissions
 
 - **https://api.dictionaryapi.dev/**: Access Dictionary API for word definitions
-- **https://libretranslate.com/**: Access translation service for phrases
+- **https://translate.googleapis.com/**: Primary translation service (Google)
+- **https://translate.argosopentech.com/**: Fallback translation service (Argos)
 - **https://type.fit/**: Access quotes API for daily inspiration
 
 ## Data Security
