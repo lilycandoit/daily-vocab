@@ -15,7 +15,7 @@ Built for non-native English speakers who want quick pronunciation confirmation 
 ## ✨ Features
 
 ### Quick Lookup
-- **Double-click any word** → See IPA pronunciation + brief translation
+- **Select or Double-click any text** → See IPA pronunciation + brief translation
 - **Audio playback** for correct pronunciation
 - **Minimal tooltip** that doesn't interrupt reading
 - **Save words** for later review (one click)

@@ -49,7 +49,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     await chrome.storage.sync.set({
       settings: {
         userLanguage: 'vi',
-        selectionMethod: 'double-click',
+        selectionMethod: 'selection',
         autoDismiss: 5000,
         reminderEnabled: true,
         reminderTime: '21:00',
@@ -81,9 +81,23 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
     // Update existing settings if they are using the old 3s timeout
     const settingsResult = await chrome.storage.sync.get('settings');
-    if (settingsResult.settings && settingsResult.settings.autoDismiss === 3000) {
-      settingsResult.settings.autoDismiss = 5000;
-      await chrome.storage.sync.set({ settings: settingsResult.settings });
+    if (settingsResult.settings) {
+      let updated = false;
+
+      if (settingsResult.settings.autoDismiss === 3000) {
+        settingsResult.settings.autoDismiss = 5000;
+        updated = true;
+      }
+
+      // Update default selection method to 'selection' for better UX
+      if (settingsResult.settings.selectionMethod === 'double-click') {
+        settingsResult.settings.selectionMethod = 'selection';
+        updated = true;
+      }
+
+      if (updated) {
+        await chrome.storage.sync.set({ settings: settingsResult.settings });
+      }
     }
   }
 });

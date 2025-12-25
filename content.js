@@ -34,7 +34,7 @@ class DailyVocabContent {
     const defaultSettings = {
       userLanguage: 'vi',
       maxPhraseLength: 50,
-      selectionMethod: 'double-click',
+      selectionMethod: 'selection',
       autoDismiss: 5000,
       tooltipPosition: 'auto'
     };
