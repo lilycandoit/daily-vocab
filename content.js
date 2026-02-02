@@ -177,11 +177,11 @@ class DailyVocabContent {
       // Create tooltip element
       this.createTooltip();
 
-      // Position tooltip
-      this.positionTooltip(rect);
-
-      // Populate tooltip content
+      // Populate tooltip content first (so we can measure dimensions)
       this.populateTooltip(wordData);
+
+      // Position tooltip (after content is populated)
+      this.positionTooltip(rect);
 
       // Show tooltip
       this.showTooltipElement();
@@ -244,46 +244,72 @@ class DailyVocabContent {
   }
 
   positionTooltip(rect) {
-    const tooltipRect = this.tooltip.getBoundingClientRect();
+    // Render tooltip off-screen first to measure dimensions
+    this.tooltip.style.display = 'block';
+    this.tooltip.style.opacity = '0';
+    this.tooltip.style.position = 'absolute';
+    this.tooltip.style.top = '-9999px';
+    this.tooltip.style.left = '-9999px';
+
+    // Force layout to get accurate dimensions
+    const tooltipHeight = this.tooltip.offsetHeight;
+    const tooltipWidth = this.tooltip.offsetWidth;
+
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const scrollX = window.pageXOffset;
     const scrollY = window.pageYOffset;
 
     let top, left;
+    const gap = 8; // Gap between text and tooltip
+    const minSpaceRequired = tooltipHeight + gap;
 
-    // Determine vertical position
-    const spaceAbove = rect.top; // Space in viewport above the text
-    const spaceBelow = viewportHeight - rect.bottom; // Space in viewport below the text
+    // Calculate available space in viewport
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
 
-    if (spaceBelow >= tooltipRect.height + 10) {
-      // Position below the text
-      top = rect.bottom + scrollY + 2; // Closer spacing
-    } else if (spaceAbove >= tooltipRect.height + 10) {
-      // Position above the text
-      top = rect.top + scrollY - tooltipRect.height - 2; // Closer spacing
+    // Remove previous position classes
+    this.tooltip.classList.remove('dv-tooltip-above', 'dv-tooltip-below');
+
+    // Default: position below. Only go above if not enough space below
+    if (spaceBelow >= minSpaceRequired) {
+      // Position below the text (default)
+      top = rect.bottom + scrollY + gap;
+      this.tooltip.classList.add('dv-tooltip-below');
+    } else if (spaceAbove >= minSpaceRequired) {
+      // Position above the text (fallback)
+      top = rect.top + scrollY - tooltipHeight - gap;
+      this.tooltip.classList.add('dv-tooltip-above');
     } else {
-      // Not enough space, position at viewport edge
-      top = scrollY + 10;
+      // Not enough space either way - pick the side with more space
+      if (spaceBelow >= spaceAbove) {
+        top = rect.bottom + scrollY + gap;
+        this.tooltip.classList.add('dv-tooltip-below');
+      } else {
+        top = rect.top + scrollY - tooltipHeight - gap;
+        this.tooltip.classList.add('dv-tooltip-above');
+      }
     }
 
-    // Determine horizontal position
-    const tooltipWidth = tooltipRect.width;
+    // Determine horizontal position - center on text, but keep within viewport
     const textCenter = rect.left + rect.width / 2;
 
-    if (textCenter - tooltipWidth / 2 >= 0 && textCenter + tooltipWidth / 2 <= viewportWidth) {
-      // Center horizontally with the text
-      left = textCenter - tooltipWidth / 2;
-    } else if (rect.left >= tooltipWidth) {
-      // Position to the left of the text
-      left = rect.left - tooltipWidth - 5;
-    } else {
-      // Position to the right of the text
-      left = rect.right + 5;
+    // Try to center horizontally
+    left = textCenter - tooltipWidth / 2;
+
+    // Adjust if overflowing left edge
+    if (left < 10) {
+      left = 10;
+    }
+    // Adjust if overflowing right edge
+    if (left + tooltipWidth > viewportWidth - 10) {
+      left = viewportWidth - tooltipWidth - 10;
     }
 
-    // Apply positioning
-    this.tooltip.style.position = 'absolute';
+    // Add scroll offset for absolute positioning
+    left += scrollX;
+
+    // Apply final positioning
     this.tooltip.style.top = `${top}px`;
     this.tooltip.style.left = `${left}px`;
     this.tooltip.style.zIndex = '10000';
@@ -550,15 +576,7 @@ class DailyVocabContent {
   showErrorTooltip(message) {
     this.createTooltip();
 
-    const rect = {
-      top: window.innerHeight / 2,
-      bottom: window.innerHeight / 2,
-      left: window.innerWidth / 2,
-      right: window.innerWidth / 2
-    };
-
-    this.positionTooltip(rect);
-
+    // Populate content first so we can measure dimensions
     this.tooltip.innerHTML = `
       <div class="dv-tooltip-content dv-error">
         <div class="dv-error-message">${this.escapeHtml(message)}</div>
@@ -567,6 +585,15 @@ class DailyVocabContent {
         </div>
       </div>
     `;
+
+    const rect = {
+      top: window.innerHeight / 2,
+      bottom: window.innerHeight / 2,
+      left: window.innerWidth / 2,
+      right: window.innerWidth / 2
+    };
+
+    this.positionTooltip(rect);
 
     const closeBtn = document.getElementById('dv-close-btn');
     if (closeBtn) {
