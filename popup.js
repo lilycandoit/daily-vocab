@@ -616,7 +616,7 @@ class DailyVocabPopup {
     }
   }
 
-  openChatGPT() {
+  async openChatGPT() {
     const promptType = document.getElementById('promptSelect').value;
     const filteredWords = this.getFilteredWords();
 
@@ -626,10 +626,18 @@ class DailyVocabPopup {
     }
 
     const prompt = this.generatePrompt(promptType, filteredWords);
-    const encodedPrompt = encodeURIComponent(prompt);
 
-    const chatGPTUrl = `https://chat.openai.com/?q=${encodedPrompt}`;
-    window.open(chatGPTUrl, '_blank');
+    // Copy prompt to clipboard first (ChatGPT doesn't support URL prefilling)
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch (err) {
+      this.showError('Failed to copy prompt to clipboard');
+      return;
+    }
+
+    // Open ChatGPT and show instruction
+    window.open('https://chatgpt.com', '_blank');
+    this.showMessage('Prompt copied! Paste it in ChatGPT (Ctrl+V / Cmd+V)');
   }
 
   showStatsModal() {
