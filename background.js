@@ -39,6 +39,33 @@ function getNextReminderTime(timeStr) {
   return next.getTime();
 }
 
+// Helper: Update or create the daily reminder alarm
+async function updateReminderAlarm() {
+  const settingsResult = await chrome.storage.sync.get('settings');
+  const settings = settingsResult.settings || {};
+
+  // Clear existing alarm
+  await chrome.alarms.clear('daily-review');
+
+  // Create new alarm if reminders are enabled
+  if (settings.reminderEnabled !== false) {
+    const reminderTime = settings.reminderTime || '21:00';
+    const nextAlarmTime = getNextReminderTime(reminderTime);
+
+    chrome.alarms.create('daily-review', {
+      when: nextAlarmTime,
+      periodInMinutes: 1440 // 24 hours
+    });
+
+    console.log('Daily reminder alarm set:', {
+      time: reminderTime,
+      nextAlarm: new Date(nextAlarmTime).toLocaleString()
+    });
+  } else {
+    console.log('Daily reminder disabled');
+  }
+}
+
 // Handle initialization
 chrome.runtime.onInstalled.addListener(async (details) => {
   await migrateStorage();
@@ -70,11 +97,8 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       }
     });
 
-    // Create daily alarm
-    chrome.alarms.create('daily-review', {
-      when: getNextReminderTime('21:00'),
-      periodInMinutes: 1440
-    });
+    // Create daily reminder alarm
+    await updateReminderAlarm();
   } else if (details.reason === 'update') {
     // Clear cache on update to ensure new features/logic work correctly
     await WordCache.clearCache();
@@ -100,7 +124,15 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         await chrome.storage.sync.set({ settings: settingsResult.settings });
       }
     }
+
+    // Ensure alarm exists after update
+    await updateReminderAlarm();
   }
+});
+
+// Ensure alarm exists when service worker starts
+chrome.runtime.onStartup.addListener(async () => {
+  await updateReminderAlarm();
 });
 
 // Storage Helpers
@@ -129,28 +161,42 @@ async function saveStatistics(statistics) {
 
 // Alarms & Notifications
 chrome.alarms.onAlarm.addListener(async (alarm) => {
+  console.log('Alarm triggered:', alarm.name);
+
   if (alarm.name === 'daily-review') {
     const settingsResult = await chrome.storage.sync.get('settings');
     const settings = settingsResult.settings || {};
 
     if (settings.reminderEnabled !== false) {
       const words = await getWords();
-      if (words.length > 0) {
-        chrome.notifications.create('review-reminder', {
-          type: 'basic',
-          iconUrl: 'icons/icon128.png',
-          title: 'Daily Vocab Review',
-          message: `You have ${words.length} words to review today! 📚`,
-          buttons: [{ title: 'Start Review' }]
-        });
-      }
+      const message = words.length > 0
+        ? `You have ${words.length} words to review today! 📚`
+        : 'Time to learn some new words! 📚';
+
+      chrome.notifications.create(`review-reminder-${Date.now()}`, {
+        type: 'basic',
+        iconUrl: 'icons/icon128.png',
+        title: 'Daily Vocab Review',
+        message: message,
+        priority: 2,
+        requireInteraction: true  // Keep notification visible until user interacts
+      }, (notificationId) => {
+        if (chrome.runtime.lastError) {
+          console.error('Notification error:', chrome.runtime.lastError);
+        } else {
+          console.log('Notification created:', notificationId);
+        }
+      });
+    } else {
+      console.log('Reminders disabled in settings');
     }
   }
 });
 
-chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
-  if (notifId === 'review-reminder' && btnIdx === 0) {
-    chrome.action.openPopup();
+chrome.notifications.onClicked.addListener((notifId) => {
+  if (notifId.startsWith('review-reminder')) {
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+    chrome.notifications.clear(notifId);
   }
 });
 
@@ -319,6 +365,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         case 'updateSettings':
           await chrome.storage.sync.set({ settings: message.settings });
+          // Update alarm if reminder settings changed
+          await updateReminderAlarm();
           sendResponse({ success: true });
           break;
 
