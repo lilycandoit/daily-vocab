@@ -41,11 +41,12 @@ class DailyVocabPopup {
   async loadData() {
     try {
       // Load in parallel for better performance
-      const [wordsResponse, settingsResponse, statsResponse] = await Promise.all([
-        chrome.runtime.sendMessage({ action: 'getWords' }),
-        chrome.runtime.sendMessage({ action: 'getSettings' }),
-        chrome.runtime.sendMessage({ action: 'getStatistics' })
-      ]);
+      const [wordsResponse, settingsResponse, statsResponse] =
+        await Promise.all([
+          chrome.runtime.sendMessage({ action: 'getWords' }),
+          chrome.runtime.sendMessage({ action: 'getSettings' }),
+          chrome.runtime.sendMessage({ action: 'getStatistics' }),
+        ]);
 
       if (wordsResponse && wordsResponse.success) {
         this.words = wordsResponse.words || [];
@@ -60,7 +61,6 @@ class DailyVocabPopup {
       if (statsResponse && statsResponse.success) {
         this.statistics = statsResponse.statistics || {};
       }
-
     } catch (error) {
       console.error('Error loading data:', error);
       throw error;
@@ -99,13 +99,17 @@ class DailyVocabPopup {
       this.showExportModal();
     });
 
-    document.getElementById('markAllReviewedBtn').addEventListener('click', () => {
-      this.markAllAsReviewed();
-    });
+    document
+      .getElementById('markAllReviewedBtn')
+      .addEventListener('click', () => {
+        this.markAllAsReviewed();
+      });
 
-    document.getElementById('reviewCompleteBtn').addEventListener('click', () => {
-      this.completeReviewSession();
-    });
+    document
+      .getElementById('reviewCompleteBtn')
+      .addEventListener('click', () => {
+        this.completeReviewSession();
+      });
 
     // Footer links
     document.getElementById('howToUseLinkBtn').addEventListener('click', () => {
@@ -131,9 +135,11 @@ class DailyVocabPopup {
 
   setupModalListeners() {
     // Export modal
-    document.getElementById('exportModalClose').addEventListener('click', () => {
-      this.hideModal('exportModal');
-    });
+    document
+      .getElementById('exportModalClose')
+      .addEventListener('click', () => {
+        this.hideModal('exportModal');
+      });
 
     document.getElementById('copyExportBtn').addEventListener('click', () => {
       this.copyToClipboard();
@@ -161,16 +167,18 @@ class DailyVocabPopup {
     });
 
     // How to use modal
-    document.getElementById('howToUseModalClose').addEventListener('click', () => {
-      this.hideModal('howToUseModal');
-    });
+    document
+      .getElementById('howToUseModalClose')
+      .addEventListener('click', () => {
+        this.hideModal('howToUseModal');
+      });
 
     document.getElementById('startUsingBtn').addEventListener('click', () => {
       this.hideModal('howToUseModal');
     });
 
     // Close modals on background click
-    document.querySelectorAll('.modal').forEach(modal => {
+    document.querySelectorAll('.modal').forEach((modal) => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           modal.style.display = 'none';
@@ -183,7 +191,7 @@ class DailyVocabPopup {
     this.currentView = view;
 
     // Update button states
-    document.querySelectorAll('.view-btn').forEach(btn => {
+    document.querySelectorAll('.view-btn').forEach((btn) => {
       btn.classList.remove('active');
     });
 
@@ -209,10 +217,13 @@ class DailyVocabPopup {
 
     // Apply search filter
     if (this.searchQuery) {
-      filteredWords = filteredWords.filter(word =>
-        word.text.toLowerCase().includes(this.searchQuery) ||
-        (word.translation && word.translation.toLowerCase().includes(this.searchQuery)) ||
-        (word.context && word.context.toLowerCase().includes(this.searchQuery))
+      filteredWords = filteredWords.filter(
+        (word) =>
+          word.text.toLowerCase().includes(this.searchQuery) ||
+          (word.translation &&
+            word.translation.toLowerCase().includes(this.searchQuery)) ||
+          (word.context &&
+            word.context.toLowerCase().includes(this.searchQuery)),
       );
     }
 
@@ -236,8 +247,9 @@ class DailyVocabPopup {
         break;
       case 'date':
       default:
-        this.words.sort((a, b) =>
-          new Date(b.metadata.dateSaved) - new Date(a.metadata.dateSaved)
+        this.words.sort(
+          (a, b) =>
+            new Date(b.metadata.dateSaved) - new Date(a.metadata.dateSaved),
         );
         break;
     }
@@ -294,7 +306,7 @@ class DailyVocabPopup {
     const container = document.getElementById('wordCards');
     container.innerHTML = '';
 
-    words.forEach(word => {
+    words.forEach((word) => {
       const card = this.createWordCard(word);
       container.appendChild(card);
     });
@@ -313,27 +325,33 @@ class DailyVocabPopup {
       <div class="word-card-header">
         <div class="word-main">
           <div class="word-text">${this.escapeHtml(word.text)}</div>
-          ${isPhrase ?
-            '<div class="word-type">(phrase)</div>' :
-            word.ipa ? `<div class="word-ipa">${this.escapeHtml(word.ipa)}</div>` : ''
+          ${
+            isPhrase
+              ? '<div class="word-type">(phrase)</div>'
+              : word.ipa
+                ? `<div class="word-ipa">${this.escapeHtml(word.ipa)}</div>`
+                : ''
           }
         </div>
         <div class="word-actions">
-          ${!isPhrase && word.audio ?
-            `<button class="btn btn-icon btn-audio" data-word-id="${word.id}" title="Play pronunciation">🔊</button>` :
-            ''
+          ${
+            !isPhrase && word.audio
+              ? `<button class="btn btn-icon btn-audio" data-word-id="${word.id}" title="Play pronunciation">🔊</button>`
+              : ''
           }
           <button class="btn btn-icon btn-delete" data-word-id="${word.id}" title="Delete word">🗑</button>
         </div>
       </div>
 
-      ${word.translation ?
-        `<div class="word-translation">${this.escapeHtml(word.translation)}</div>` :
-        ''
+      ${
+        word.translation
+          ? `<div class="word-translation">${this.escapeHtml(word.translation)}</div>`
+          : ''
       }
 
-      ${word.context ?
-        `<div class="word-card-actions">
+      ${
+        word.context
+          ? `<div class="word-card-actions">
           <div class="word-context">${this.escapeHtml(word.context)}</div>
           <div class="word-buttons">
             <button class="btn btn-small ${word.metadata.isReviewed ? 'btn-secondary' : 'btn-primary'}"
@@ -341,8 +359,8 @@ class DailyVocabPopup {
               ${word.metadata.isReviewed ? 'Reviewed' : 'Mark Reviewed'}
             </button>
           </div>
-        </div>` :
-        ''
+        </div>`
+          : ''
       }
 
       <div class="word-date">Added ${formattedDate}</div>
@@ -390,7 +408,7 @@ class DailyVocabPopup {
     const container = document.getElementById('wordList');
     container.innerHTML = '';
 
-    words.forEach(word => {
+    words.forEach((word) => {
       const listItem = this.createWordListItem(word);
       container.appendChild(listItem);
     });
@@ -422,13 +440,13 @@ class DailyVocabPopup {
 
   async playWordAudio(wordId) {
     try {
-      const word = this.words.find(w => w.id === wordId);
+      const word = this.words.find((w) => w.id === wordId);
       if (!word || !word.audio) return;
 
       // Use the background's offscreen logic for consistency and robustness
       await chrome.runtime.sendMessage({
         action: 'playAudio',
-        audioUrl: WordAPI.getAudioUrl(word.audio)
+        audioUrl: WordAPI.getAudioUrl(word.audio),
       });
     } catch (error) {
       console.error('Error playing audio:', error);
@@ -443,12 +461,12 @@ class DailyVocabPopup {
     try {
       const response = await chrome.runtime.sendMessage({
         action: 'deleteWord',
-        wordId: wordId
+        wordId: wordId,
       });
 
       if (response && response.success) {
         // Remove from local array
-        this.words = this.words.filter(w => w.id !== wordId);
+        this.words = this.words.filter((w) => w.id !== wordId);
 
         // Re-render
         this.renderView();
@@ -462,7 +480,7 @@ class DailyVocabPopup {
 
   async toggleReviewed(wordId) {
     try {
-      const word = this.words.find(w => w.id === wordId);
+      const word = this.words.find((w) => w.id === wordId);
       if (!word) return;
 
       const newReviewedStatus = !word.metadata.isReviewed;
@@ -473,9 +491,9 @@ class DailyVocabPopup {
         updates: {
           metadata: {
             isReviewed: newReviewedStatus,
-            lastReviewed: newReviewedStatus ? new Date().toISOString() : null
-          }
-        }
+            lastReviewed: newReviewedStatus ? new Date().toISOString() : null,
+          },
+        },
       });
 
       if (response && response.success) {
@@ -498,31 +516,31 @@ class DailyVocabPopup {
   async markAllAsReviewed() {
     if (this.words.length === 0) return;
 
-    const unreviewedWords = this.words.filter(w => !w.metadata.isReviewed);
+    const unreviewedWords = this.words.filter((w) => !w.metadata.isReviewed);
     if (unreviewedWords.length === 0) {
       this.showMessage('All words are already reviewed!');
       return;
     }
 
     try {
-      const updatePromises = unreviewedWords.map(word =>
+      const updatePromises = unreviewedWords.map((word) =>
         chrome.runtime.sendMessage({
           action: 'updateWord',
           wordId: word.id,
           updates: {
             metadata: {
               isReviewed: true,
-              lastReviewed: new Date().toISOString()
-            }
-          }
-        })
+              lastReviewed: new Date().toISOString(),
+            },
+          },
+        }),
       );
 
       const responses = await Promise.all(updatePromises);
 
-      if (responses.every(r => r && r.success)) {
+      if (responses.every((r) => r && r.success)) {
         // Update local words
-        this.words.forEach(word => {
+        this.words.forEach((word) => {
           if (!word.metadata.isReviewed) {
             word.metadata.isReviewed = true;
             word.metadata.lastReviewed = new Date().toISOString();
@@ -542,7 +560,7 @@ class DailyVocabPopup {
   async completeReviewSession() {
     try {
       const response = await chrome.runtime.sendMessage({
-        action: 'markReviewComplete'
+        action: 'markReviewComplete',
       });
 
       if (response && response.success) {
@@ -567,7 +585,8 @@ class DailyVocabPopup {
     const filteredWords = this.getFilteredWords();
 
     if (filteredWords.length === 0) {
-      document.getElementById('previewContent').textContent = 'No words to export';
+      document.getElementById('previewContent').textContent =
+        'No words to export';
       return;
     }
 
@@ -576,47 +595,53 @@ class DailyVocabPopup {
   }
 
   generatePrompt(type, words) {
-    const wordList = words.map(word => {
-      let line = `• ${word.text}`;
+    const wordList = words
+      .map((word) => {
+        let line = `• ${word.text}`;
 
-      if (word.ipa) {
-        line += ` (${word.ipa})`;
-      }
+        if (word.ipa) {
+          line += ` (${word.ipa})`;
+        }
 
-      if (word.translation) {
-        line += ` - ${word.translation}`;
-      }
+        if (word.translation) {
+          line += ` - ${word.translation}`;
+        }
 
-      if (word.context) {
-        line += `\n  Context: ${word.context}`;
-      }
+        if (word.context) {
+          line += `\n  Context: ${word.context}`;
+        }
 
-      return line;
-    }).join('\n\n');
+        return line;
+      })
+      .join('\n\n');
 
     const prompts = {
-      'australian-usage': `Please explain these words with Australian English usage examples, phonetics, and natural context:\n\n${wordList}`,
-      'comprehensive': `Provide detailed explanations including phonetics, synonyms, examples, and usage patterns for these words:\n\n${wordList}`,
-      'pronunciation-focus': `Focus on pronunciation challenges, phonetic breakdown, and common mistakes for these words:\n\n${wordList}`,
-      'context-examples': `Create natural, everyday examples (preferably Australian context) for these words:\n\n${wordList}`
+      'australian-usage': `For each word: IPA, meaning (technical meaning first if applicable), Australian English examples, collocations. Don't skip any.\n\n${wordList}`,
+
+      'comprehensive': `For each word: IPA, meaning (technical first if applicable), synonyms, antonyms, collocations, 2-3 example sentences. Don't skip any.\n\n${wordList}`,
+
+      'pronunciation-focus': `For each word: IPA, stress patterns, common pronunciation mistakes for ESL learners, example sentence. Don't skip any.\n\n${wordList}`,
+
+      'context-examples': `For each word: natural everyday examples (Australian context preferred). For technical words, include professional context. Don't skip any.\n\n${wordList}`,
+
+      'story-bilingual': `Create ONE story using ALL these words naturally. Output as table: English | Vietnamese translation. Don't skip any word.\n\n${wordList}`,
     };
 
-    return prompts[type] || prompts['australian-usage'];
+    return prompts[type] || prompts['comprehensive'];
   }
 
   async copyToClipboard() {
     try {
       const previewContent = document.getElementById('previewContent').textContent;
-
       await navigator.clipboard.writeText(previewContent);
-      this.showMessage('Words copied to clipboard!');
+      this.showMessage('Prompt copied to clipboard!');
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       this.showError('Failed to copy to clipboard');
     }
   }
 
-  async openChatGPT() {
+  openChatGPT() {
     const promptType = document.getElementById('promptSelect').value;
     const filteredWords = this.getFilteredWords();
 
@@ -626,18 +651,10 @@ class DailyVocabPopup {
     }
 
     const prompt = this.generatePrompt(promptType, filteredWords);
+    const encodedPrompt = encodeURIComponent(prompt);
 
-    // Copy prompt to clipboard first (ChatGPT doesn't support URL prefilling)
-    try {
-      await navigator.clipboard.writeText(prompt);
-    } catch (err) {
-      this.showError('Failed to copy prompt to clipboard');
-      return;
-    }
-
-    // Open ChatGPT and show instruction
-    window.open('https://chatgpt.com', '_blank');
-    this.showMessage('Prompt copied! Paste it in ChatGPT (Ctrl+V / Cmd+V)');
+    const chatGPTUrl = `https://chatgpt.com/?q=${encodedPrompt}`;
+    window.open(chatGPTUrl, '_blank');
   }
 
   showStatsModal() {
@@ -648,15 +665,22 @@ class DailyVocabPopup {
   async updateStatisticsDisplay() {
     try {
       // Get fresh statistics
-      const response = await chrome.runtime.sendMessage({ action: 'getStatistics' });
+      const response = await chrome.runtime.sendMessage({
+        action: 'getStatistics',
+      });
       if (response && response.success) {
         const stats = response.statistics;
 
-        document.getElementById('totalWordsStat').textContent = stats.totalWords || 0;
-        document.getElementById('wordsThisWeekStat').textContent = stats.wordsThisWeek || 0;
-        document.getElementById('currentStreakStat').textContent = stats.currentStreak || 0;
+        document.getElementById('totalWordsStat').textContent =
+          stats.totalWords || 0;
+        document.getElementById('wordsThisWeekStat').textContent =
+          stats.wordsThisWeek || 0;
+        document.getElementById('currentStreakStat').textContent =
+          stats.currentStreak || 0;
 
-        const unreviewedCount = this.words.filter(w => !w.metadata.isReviewed).length;
+        const unreviewedCount = this.words.filter(
+          (w) => !w.metadata.isReviewed,
+        ).length;
         document.getElementById('unreviewedStat').textContent = unreviewedCount;
 
         // Update storage usage
@@ -672,13 +696,17 @@ class DailyVocabPopup {
       const storageUsage = await StorageManager.getStorageUsage();
       if (storageUsage) {
         const MAX_STORAGE = 5 * 1024 * 1024; // 5MB local storage limit
-        const percentage = Math.min((storageUsage.total / MAX_STORAGE) * 100, 100);
+        const percentage = Math.min(
+          (storageUsage.total / MAX_STORAGE) * 100,
+          100,
+        );
         document.getElementById('storageFill').style.width = `${percentage}%`;
         document.getElementById('storageText').textContent =
           `${Math.round(storageUsage.total / 1024)}KB used of 5MB (${Math.round(percentage)}%)`;
       }
     } catch (error) {
-      document.getElementById('storageText').textContent = 'Storage info unavailable';
+      document.getElementById('storageText').textContent =
+        'Storage info unavailable';
     }
   }
 
@@ -691,12 +719,18 @@ class DailyVocabPopup {
   }
 
   async clearAllWords() {
-    if (!confirm('Are you sure you want to delete all words? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to delete all words? This action cannot be undone.',
+      )
+    ) {
       return;
     }
 
     try {
-      const response = await chrome.runtime.sendMessage({ action: 'clearAllWords' });
+      const response = await chrome.runtime.sendMessage({
+        action: 'clearAllWords',
+      });
 
       if (response && response.success) {
         this.words = [];
@@ -737,7 +771,7 @@ class DailyVocabPopup {
     try {
       const response = await chrome.runtime.sendMessage({
         action: 'updateSettings',
-        settings: { [key]: value }
+        settings: { [key]: value },
       });
 
       if (response && response.success) {
@@ -765,7 +799,7 @@ class DailyVocabPopup {
   async updateStats() {
     try {
       const response = await chrome.runtime.sendMessage({
-        action: 'getStatistics'
+        action: 'getStatistics',
       });
 
       if (response && response.success) {
@@ -779,7 +813,9 @@ class DailyVocabPopup {
 
   updateStats() {
     // Update header statistics
-    const unreviewedCount = this.words.filter(w => !w.metadata.isReviewed).length;
+    const unreviewedCount = this.words.filter(
+      (w) => !w.metadata.isReviewed,
+    ).length;
     document.getElementById('wordCount').textContent =
       `${this.words.length} word${this.words.length !== 1 ? 's' : ''}`;
   }
