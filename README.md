@@ -49,10 +49,10 @@ cd daily-vocab
 
 ## 🧭 How to Use Daily Vocab Effectively
 
-1. **Read normally** — Double-click unfamiliar words to check pronunciation
+1. **Read normally** — Double-click unfamiliar words/ phrases to check pronunciation/ meaning
 2. **Save useful words** with one click (💾 button in tooltip)
-3. **Review your list** anytime in the popup (we'll remind you at 9 PM daily if you're busy)
-4. **Export your word list** with pre-designed prompts to send to ChatGPT or your favorite AI for deep explanations
+3. **Review your list** anytime in the popup (we'll remind you at your preferred time or 9 PM daily by default if you're busy)
+4. **Export your word list** with pre-designed prompts to send to ChatGPT/ your favorite AI for deep explanations/ bilingual story/ your custom promts
 5. **Repeat daily** for consistent progress
 
 > **Pro tip**: Don't save too many words at once! Focus on 10-20 words per day for better retention.
@@ -115,6 +115,34 @@ Access settings via:
 - **Daily Reminder**: Enable/disable 9 PM notifications
 - **Storage Limit**: Max words to save (default: 200)
 - **Cache**: Enable for better performance
+
+## 🔔 Daily Reminder Setup
+
+The extension sends a daily reminder at your chosen time (default: 9 PM) to help build a consistent learning habit.
+
+### Enable Notifications
+
+**macOS:**
+1. Go to **System Preferences** → **Notifications** → **Google Chrome**
+2. Turn on **Allow notifications**
+3. Set **Alert Style** to **Alerts** or **Banners**
+4. Make sure **Do Not Disturb** / **Focus Mode** is OFF
+
+**Windows:**
+1. Go to **Settings** → **System** → **Notifications**
+2. Turn on **Google Chrome** notifications
+3. Make sure **Focus Assist** is OFF
+
+**Chrome (all platforms):**
+1. Go to `chrome://settings/content/notifications`
+2. Make sure notifications are not blocked
+
+### Customize Reminder Time
+1. Click extension icon → **Settings**
+2. Find **Reminder Time** under Notifications
+3. Set your preferred time
+
+> **Tip**: Choose a time when you're usually free, like after dinner or before bed.
 
 ## 🤝 Contributing
 
