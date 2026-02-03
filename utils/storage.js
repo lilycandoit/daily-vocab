@@ -278,7 +278,7 @@ class StorageManager {
       groupBy: 'date',
       audioBehavior: 'click',
       selectionMethod: 'double-click',
-      autoDismiss: 3000,
+      autoDismiss: 0, // 0 = disabled (stays open until user clicks outside, presses Esc, or selects new word)
       tooltipPosition: 'auto'
     };
 

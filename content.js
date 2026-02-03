@@ -35,7 +35,7 @@ class DailyVocabContent {
       userLanguage: 'vi',
       maxPhraseLength: 50,
       selectionMethod: 'selection',
-      autoDismiss: 5000,
+      autoDismiss: 0, // 0 = disabled (Google Translate style - stays open until user action)
       tooltipPosition: 'auto'
     };
 
@@ -98,6 +98,11 @@ class DailyVocabContent {
   }
 
   handleDoubleClick(event) {
+    // Ignore clicks inside the tooltip
+    if (this.tooltip && this.tooltip.contains(event.target)) {
+      return;
+    }
+
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
 
@@ -110,6 +115,11 @@ class DailyVocabContent {
   }
 
   handleTextSelection(event) {
+    // Ignore clicks inside the tooltip
+    if (this.tooltip && this.tooltip.contains(event.target)) {
+      return;
+    }
+
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
@@ -186,7 +196,8 @@ class DailyVocabContent {
       // Show tooltip
       this.showTooltipElement();
 
-      // Set up auto-dismiss
+      // Set up auto-dismiss if enabled (0 = disabled, stays open until user action)
+      // Tooltip closes when user: clicks outside, presses Escape, or selects new word
       this.setAutoDismiss();
 
     } catch (error) {
@@ -406,8 +417,14 @@ class DailyVocabContent {
       });
     }
 
-    // Prevent tooltip clicks from propagating
+    // Prevent tooltip interactions from propagating to document
     this.tooltip.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    this.tooltip.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    this.tooltip.addEventListener('mouseup', (e) => {
       e.stopPropagation();
     });
   }
@@ -541,8 +558,9 @@ class DailyVocabContent {
       clearTimeout(this.dismissTimeout);
     }
 
-    const autoDismiss = this.settings.autoDismiss || 3000;
-    if (autoDismiss > 0) {
+    // 0 = disabled (Google Translate style - stays open until user action)
+    const autoDismiss = this.settings.autoDismiss;
+    if (autoDismiss && autoDismiss > 0) {
       this.dismissTimeout = setTimeout(() => {
         this.hideTooltip();
       }, autoDismiss);

@@ -78,7 +78,7 @@ class DailyVocabOptions {
     });
 
     document.getElementById('autoDismiss').addEventListener('input', (e) => {
-      this.updateRangeValue('autoDismissValue', e.target.value, 's');
+      this.updateAutoDismissValue(e.target.value);
       this.markDirty();
     });
 
@@ -142,7 +142,7 @@ class DailyVocabOptions {
     });
 
     document.getElementById('autoDismiss').addEventListener('input', (e) => {
-      this.updateRangeValue('autoDismissValue', e.target.value, 's');
+      this.updateAutoDismissValue(e.target.value);
     });
 
     document.getElementById('maxWords').addEventListener('input', (e) => {
@@ -170,8 +170,9 @@ class DailyVocabOptions {
     document.querySelector(`input[name="selectionMethod"][value="${selectionMethod}"]`).checked = true;
 
     document.getElementById('tooltipPosition').value = this.settings.tooltipPosition || 'auto';
-    document.getElementById('autoDismiss').value = this.settings.autoDismiss || 5000;
-    this.updateRangeValue('autoDismissValue', (this.settings.autoDismiss || 5000) / 1000, 's');
+    const autoDismissValue = this.settings.autoDismiss !== undefined ? this.settings.autoDismiss : 0;
+    document.getElementById('autoDismiss').value = autoDismissValue;
+    this.updateAutoDismissValue(autoDismissValue);
 
     // Audio settings
     const audioBehavior = this.settings.audioBehavior || 'click';
@@ -202,6 +203,18 @@ class DailyVocabOptions {
     const element = document.getElementById(elementId);
     if (element) {
       element.textContent = value + suffix;
+    }
+  }
+
+  updateAutoDismissValue(milliseconds) {
+    const element = document.getElementById('autoDismissValue');
+    if (element) {
+      if (milliseconds === 0 || milliseconds === '0') {
+        element.textContent = 'Off';
+      } else {
+        const seconds = (parseInt(milliseconds) / 1000).toFixed(1);
+        element.textContent = seconds + 's';
+      }
     }
   }
 

@@ -50,7 +50,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       settings: {
         userLanguage: 'vi',
         selectionMethod: 'selection',
-        autoDismiss: 5000,
+        autoDismiss: 0, // 0 = disabled (Google Translate style)
         reminderEnabled: true,
         reminderTime: '21:00',
         maxWords: 200
@@ -84,8 +84,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     if (settingsResult.settings) {
       let updated = false;
 
-      if (settingsResult.settings.autoDismiss === 3000) {
-        settingsResult.settings.autoDismiss = 5000;
+      // Migrate to Google Translate style (no auto-dismiss by default)
+      if (settingsResult.settings.autoDismiss === 3000 || settingsResult.settings.autoDismiss === 5000) {
+        settingsResult.settings.autoDismiss = 0;
         updated = true;
       }
 
