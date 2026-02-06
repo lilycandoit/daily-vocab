@@ -74,7 +74,6 @@ The extension requests the following permissions:
 ### Required Permissions
 
 - **storage**: To save your words, settings, and statistics locally on your device
-- **activeTab**: To read selected text or double-click words on webpages
 - **alarms**: To schedule daily reminder notifications at 9 PM
 - **notifications**: To display daily reminder notifications
 - **offscreen**: To securely play audio pronunciation in a background context, ensuring it works on sites with strict security policies (like Notion and ChatGPT)
