@@ -669,7 +669,7 @@ class DailyVocabPopup {
     }
   }
 
-  openChatGPT() {
+  async openChatGPT() {
     const promptType = document.getElementById('promptSelect').value;
     const filteredWords = this.getScopedWords();
 
@@ -680,9 +680,22 @@ class DailyVocabPopup {
 
     const prompt = this.generatePrompt(promptType, filteredWords);
     const encodedPrompt = encodeURIComponent(prompt);
-
     const chatGPTUrl = `https://chatgpt.com/?q=${encodedPrompt}`;
-    window.open(chatGPTUrl, '_blank');
+
+    // URL length limit: ~2000 chars is safe across all browsers
+    if (chatGPTUrl.length > 2000) {
+      // Copy to clipboard and open ChatGPT blank so user can paste
+      try {
+        await navigator.clipboard.writeText(prompt);
+        this.showMessage('Prompt too long for URL — copied to clipboard! Paste it in ChatGPT.');
+      } catch {
+        this.showError('Prompt too long. Use "Copy to Clipboard" instead.');
+      }
+      chrome.tabs.create({ url: 'https://chatgpt.com/' });
+      return;
+    }
+
+    chrome.tabs.create({ url: chatGPTUrl });
   }
 
   showStatsModal() {
