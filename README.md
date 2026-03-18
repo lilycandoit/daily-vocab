@@ -96,7 +96,6 @@ daily-vocab/
 - **Free APIs**:
   - [Dictionary API](https://dictionaryapi.dev/) - IPA & definitions
   - [Google Translate](https://translate.google.com/) (Primary) + [LibreTranslate](https://libretranslate.com/) (Fallback)
-  - [Type.fit Quotes](https://type.fit/api/quotes) - Daily inspiration
 
 ## � Language Support
 

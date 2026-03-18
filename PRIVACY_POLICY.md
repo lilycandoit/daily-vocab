@@ -60,11 +60,6 @@ The extension makes requests to the following free, public APIs to provide funct
    - Data sent: The text you look up and your target language
    - No personal data is sent
 
-3. **Type.fit Quotes API** (https://type.fit/api/quotes)
-   - Purpose: Display inspirational quotes in daily reminders
-   - Data sent: None
-   - No personal data is sent
-
 These APIs are operated by third parties. Please refer to their respective privacy policies for more information.
 
 ## Permissions Explained
@@ -83,7 +78,6 @@ The extension requests the following permissions:
 - **https://api.dictionaryapi.dev/**: Access Dictionary API for word definitions
 - **https://translate.googleapis.com/**: Primary translation service (Google)
 - **https://translate.argosopentech.com/**: Fallback translation service (Argos)
-- **https://type.fit/**: Access quotes API for daily inspiration
 
 ## Data Security
 
