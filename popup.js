@@ -149,6 +149,10 @@ class DailyVocabPopup {
       this.openChatGPT();
     });
 
+    document.getElementById('exportScopeSelect').addEventListener('change', () => {
+      this.updateExportPreview();
+    });
+
     document.getElementById('promptSelect').addEventListener('change', () => {
       this.updateExportPreview();
     });
@@ -580,17 +584,41 @@ class DailyVocabPopup {
     this.updateExportPreview();
   }
 
+  getScopedWords() {
+    const scope = document.getElementById('exportScopeSelect').value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (scope) {
+      case 'today':
+        return this.words.filter(
+          (w) => new Date(w.metadata.dateSaved) >= today,
+        );
+      case 'unreviewed':
+        return this.words.filter((w) => !w.metadata.isReviewed);
+      case 'all':
+      default:
+        return [...this.words];
+    }
+  }
+
   updateExportPreview() {
     const promptType = document.getElementById('promptSelect').value;
-    const filteredWords = this.getFilteredWords();
+    const scopedWords = this.getScopedWords();
 
-    if (filteredWords.length === 0) {
+    if (scopedWords.length === 0) {
+      const scope = document.getElementById('exportScopeSelect').value;
+      const messages = {
+        today: 'No words added today',
+        unreviewed: 'No unreviewed words',
+        all: 'No words to export',
+      };
       document.getElementById('previewContent').textContent =
-        'No words to export';
+        messages[scope] || 'No words to export';
       return;
     }
 
-    const prompt = this.generatePrompt(promptType, filteredWords);
+    const prompt = this.generatePrompt(promptType, scopedWords);
     document.getElementById('previewContent').textContent = prompt;
   }
 
@@ -643,7 +671,7 @@ class DailyVocabPopup {
 
   openChatGPT() {
     const promptType = document.getElementById('promptSelect').value;
-    const filteredWords = this.getFilteredWords();
+    const filteredWords = this.getScopedWords();
 
     if (filteredWords.length === 0) {
       this.showError('No words to export');
