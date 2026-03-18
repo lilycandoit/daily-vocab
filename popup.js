@@ -853,10 +853,6 @@ class DailyVocabPopup {
   }
 
   updateStats() {
-    // Update header statistics
-    const unreviewedCount = this.words.filter(
-      (w) => !w.metadata.isReviewed,
-    ).length;
     document.getElementById('wordCount').textContent =
       `${this.words.length} word${this.words.length !== 1 ? 's' : ''}`;
   }
